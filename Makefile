@@ -1,5 +1,3 @@
-# Note: the := variable assignment is simply expanded variable assignment which avoids recursive expansion
-
 # [ Variables ]
 
 # Compiler
