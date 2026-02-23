@@ -1,6 +1,14 @@
 /**
  * assembler.c
- * Header file of assembler.c
+ *
  */
 
-#include "assembler.h"
+#include "../include/assembler.h"
+
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+    printf("TEST\n");
+
+    return 0;
+}
