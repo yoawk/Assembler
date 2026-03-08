@@ -1,0 +1,44 @@
+/**
+ * handle_file.h
+ * Header file of handle_file.c
+ */
+
+#ifndef HANDLE_FILE_H
+#define HANDLE_FILE_H
+
+#include "errors.h"
+
+#include <stdio.h>
+
+/**
+ * Reads and returns a line from a stream using a file descriptor.
+ * Expects stream to be non-empty.
+ * Output line might not contain '\n' if EOF has been reached.
+ * @param output_line Pointer to output line string.
+ *                      Assumes *output_line points to an allocated memory block of
+ *                      at least max_size + 2 bytes (for '\n' and '\0' characters)
+ * @param max_size Maximum size of a read line (excluding '\n' and '\0')
+ * @param fp Given file descriptor
+ * @return OK on success, ERR_NULL_PTR on NULL pointer, ERR_EOF if EOF is , ERR_LINE_TOO_BIG
+ */
+return_val get_line(char *output_line, size_t max_size, FILE *fp);
+
+/**
+ *
+ * @param file_name
+ * @param file_extension
+ * @param mode
+ * @param fp
+ * @return
+ */
+return_val fopen_helper(const char *file_name, const char *file_extension, const char *mode, FILE **fp);
+
+/**
+ * Checks if a given line is empty, meaning it only contains
+ * ' ', '\t', '\n' characters.
+ * @param line Input line
+ * @return 1 if line is empty, 0 otherwise.
+ */
+int is_empty_line(const char *line);
+
+#endif
