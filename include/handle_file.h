@@ -41,4 +41,17 @@ return_val fopen_helper(const char *file_name, const char *file_extension, const
  */
 int is_empty_line(const char *line);
 
+
+/**
+ * Get the nth non-white character (not ' ', '\t', '\n') sequence (token) of a line.
+ * If nth token is found, token parameter will be set to point at the dynamically allocated nth token string.
+ * If nth token doesn't exist, token will be set to point at NULL.
+ * Output token string will be allocated only if nth token is found with no error.
+ * @param line Given line
+ * @param n Token count (starting from 1)
+ * @param token Pointer to output token string
+ * @return OK on success, ERR_NULL_PTR on NULL pointer and ERR_ALLOC_FAILED on allocation fail.
+ */
+return_val get_nth_token(const char *line, int n, char **token);
+
 #endif

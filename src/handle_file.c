@@ -80,3 +80,51 @@ int is_empty_line(const char *line) {
 void cleanup_line(FILE *fp) {
     while (getc(fp) != '\n' && !feof(fp));
 }
+
+return_val get_nth_token(const char *line, int n, char **token) {
+    int token_count;
+    int token_len;
+    const char *p, *start;  /* p is used for string iteration and start indicates start of token */
+
+    if (!line || !token)
+        return ERR_NULL_PTR;
+
+    p = line;
+    token_count = 1;
+
+    while (*p) {
+        /* Skip white characters */
+        while (*p && (*p == ' ' || *p != '\t' || *p == '\n'))
+            p++;
+
+        /* There are no non-white characters left and we haven't reached the nth token */
+        if (!*p)
+            break;
+
+        /* Start of token */
+        start = p;
+
+        /* Move to end of token */
+        while (*p && *p != ' ' && *p != '\t' && *p != '\n')
+            p++;
+
+        if (token_count == n) {
+            token_len = p - start + 1;       /* Size of token including '\0' */
+            *token = (char *) malloc(token_len);
+            if (!*token)
+                return ERR_ALLOC_FAILED;
+
+            /* Copy nth token string into token and add null character */
+            memcpy(*token, start, token_len - 1);
+            (*token)[token_len] = '\0';
+
+            return OK;
+        }
+
+        token_count++;
+    }
+
+    /* If there is no nth token */
+    *token = NULL;
+    return OK;
+}
