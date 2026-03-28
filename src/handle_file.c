@@ -94,7 +94,7 @@ return_val get_nth_token(const char *line, int n, char **token) {
 
     while (*p) {
         /* Skip white characters */
-        while (*p && (*p == ' ' || *p != '\t' || *p == '\n'))
+        while (*p && (*p == ' ' || *p == '\t' || *p == '\n'))
             p++;
 
         /* There are no non-white characters left and we haven't reached the nth token */
@@ -116,7 +116,7 @@ return_val get_nth_token(const char *line, int n, char **token) {
 
             /* Copy nth token string into token and add null character */
             memcpy(*token, start, token_len - 1);
-            (*token)[token_len] = '\0';
+            (*token)[token_len - 1] = '\0';
 
             return OK;
         }
