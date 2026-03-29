@@ -4,6 +4,9 @@
 # Text files
 *.txt
 
+# Build directory
+build/*
+
 # Prerequisites
 *.d
 
