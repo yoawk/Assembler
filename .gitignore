@@ -1,5 +1,6 @@
 # IDE
 .idea
+compile_commands.json
 
 # Text files
 *.txt
