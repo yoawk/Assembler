@@ -3,15 +3,19 @@
  * Handles printing of error messages
  */
 
-#include "../include/errors.h"
+#include "errors.h"
 
-#include "../include/globals.h"
+#include <stdio.h>
 
-/*TODO:
- * line numbers
- * alert which file (.as, .am ...)
- * print MAX_LINE_SIZE
- */
-void print_error(return_val error, unsigned int line_number) {
+#define ERROR_PREFIX_STR "[ ERROR ]"
 
+/*TODO: implement */
+void print_error(return_val error, const char *context, const char *file_name, unsigned int line_number) {
+    printf("%s ", ERROR_PREFIX_STR);
+    switch (error) {
+
+
+        default:
+            printf("Unknown error\n");
+    }
 }
