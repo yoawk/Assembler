@@ -19,19 +19,30 @@
  *                      at least max_size + 2 bytes (for '\n' and '\0' characters)
  * @param max_size Maximum size of a read line (excluding '\n' and '\0')
  * @param fp Given file descriptor
- * @return OK on success, ERR_NULL_PTR on NULL pointer, ERR_EOF if EOF is , ERR_LINE_TOO_BIG
+ * @return OK on success, ERR_NULL_PTR on NULL pointer, ERR_ONLY_EOF if no bytes left to read,
+ *          ERR_LINE_TOO_BIG if line size is bigger than max_size.
  */
 return_val get_line(char *output_line, size_t max_size, FILE *fp);
 
 /**
- *
- * @param file_name
- * @param file_extension
- * @param mode
- * @param fp
- * @return
+ * Helper function for the fopen utility.
+ * Opens a file appended by an extension with the given file access mode.
+ * @param file_name File name
+ * @param file_extension File extension (empty for non)
+ * @param mode File access mode
+ * @param fp Pointer to the result file descriptor
+ * @return OK on success. ERR_NULL_PTR, ERR_FAILED_TO_OPEN_FILE or ERR_ALLOC_FAILED on corresponding errors.
  */
 return_val fopen_helper(const char *file_name, const char *file_extension, const char *mode, FILE **fp);
+
+/**
+ * Helper function for the remove file function.
+ * Removes/Deletes a file appended by an extension.
+ * @param file_name File name
+ * @param file_extension File extension (empty for non)
+ * @return OK on success. ERR_NULL_PTR, ERR_FAILED_TO_REMOVE_FILE or ERR_ALLOC_FAILED on corresponding errors.
+ */
+return_val remove_helper(const char *file_name, const char *file_extension);
 
 /**
  * Checks if a given line is empty, meaning it only contains

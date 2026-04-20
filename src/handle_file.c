@@ -3,8 +3,8 @@
  * Utilities for file handling and line handling
  */
 
-#include "../include/handle_file.h"
-#include "../include/utils.h"
+#include "handle_file.h"
+#include "utils.h"
 
 #include <string.h>
 
@@ -36,7 +36,7 @@ return_val get_line(char *output_line, size_t max_size, FILE *fp) {
 
     /* No bytes were read and EOF has been reached */
     else if (feof(fp))
-        return ERR_EOF;
+        return ERR_ONLY_EOF;
 
     /* New line character was not found within max_size + 1 characters */
     else {
@@ -63,6 +63,30 @@ return_val fopen_helper(const char *file_name, const char *file_extension, const
     if (!*fp)
         return ERR_FAILED_TO_OPEN_FILE;
 
+    return OK;
+}
+
+return_val remove_helper(const char *file_name, const char *file_extension) {
+    char *concat_name;
+
+    if (!file_name || !file_extension)
+        return ERR_NULL_PTR;
+
+    /* Concatenate file_name and file_extension into concat_name */
+    concat_name = (char *) malloc(strlen(file_name) + strlen(file_extension) + 1);
+    if (!concat_name)
+        return ERR_ALLOC_FAILED;
+    strcpy(concat_name, file_name);
+    strcat(concat_name, file_extension);
+
+    /* Remove file with error checking */
+
+    if (remove(concat_name) != 0) {
+        free(concat_name);
+        return ERR_FAILED_TO_REMOVE_FILE;
+    }
+
+    free(concat_name);
     return OK;
 }
 
