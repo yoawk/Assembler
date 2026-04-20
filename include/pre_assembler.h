@@ -7,27 +7,37 @@
 #define PRE_ASSEMBLER_H
 
 #include "errors.h"
-#include "globals.h"
 
-#include <stdio.h>
-
-
-/* TODO: Choose structure for macro_entry */
 typedef struct {
     char *macro_name;
-
+    char *macro_content;
 } macro_entry;
 
-/* TODO: update function documentation after function is written */
+typedef struct {
+    macro_entry **macro_entries;
+    unsigned int macro_count;
+} macro_table;
+
+
 /**
+ * The main loop of the pre-assembler stage.
+ * Operates on a given .as file and performs macro expansion, comment/white lines filtering
+ * and basic error detection (mainly macro related).
+ * On success, result assembly code will be written into a new .am file with a corresponding name.
+ * When an internal error occurs, or when an error is found in the .as file,
+ * reports error and, if possible, continues processing the .as file.
+ * The resulting .am file will not be created if any error occurs, or is found, throughout the function.
  *
+ * Assumes there are no nested macro definitions.
+ * Assumes each macro definition start has a corresponding macro ending.
+ * Assumes macro calls appear only after corresponding macro definitions.
  *
- * Expands valid macro definitions, ignores empty lines and comment lines.
- * On error, reports error and continues analysis.
- * @param assembly_file_name
- * @return
+ * @param assembly_file_name The file name of the input .as file (and, if produced, .am file) without the .as extension.
+ * @param macro_table_p Pointer to an empty macro table that will be overridden and filled with macro entries.
+ *                      Freed by the caller. If ERR_PRE_ASSEMBLER_FAIL is returned, the macro table's data should be ignored.
+ * @return OK on success, ERR_PRE_ASSEMBLER_FAIL on any error.
  */
-return_val pre_assembler_loop(const char *assembly_file_name);
+return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro_table_p);
 
 
 
