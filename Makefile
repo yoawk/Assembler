@@ -14,7 +14,7 @@ DEBUG_DIR := $(BUILD_DIR)/debug
 # Compilation flags
 BASE_CFLAGS:= -Wall -ansi -pedantic -I $(INCLUDE_DIR)
 RELEASE_CFLAGS := $(BASE_CFLAGS)
-DEBUG_CFLAGS := $(BASE_CFLAGS) -g -O0
+DEBUG_CFLAGS := $(BASE_CFLAGS) -Wextra -g -O0
 
 # Define source files, their corresponding object files and executable
 SRCS := $(wildcard $(SRC_DIR)/*.c)
