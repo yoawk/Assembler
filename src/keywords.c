@@ -1,11 +1,47 @@
 /**
  * keywords.c
- * Handles reserved keywords lists and reserved keywords validation checks.
+ * Responsible for validation checks of reserved keywords.
+ * Depends on the validation checks of instructions.c .
  */
 
-#include "../include/keywords.h"
+#include "keywords.h"
+#include "instructions.h"
+
+#include <string.h>
+
+int is_directive_keyword(const char *input_string) {
+    static const char *const directives_table[] = {".data", ".string", ".entry", ".extern"};
+    static const size_t directives_count = sizeof(directives_table) / sizeof(directives_table[0]);
+    size_t i;
+
+    if (!input_string)
+        return 0;
+
+    for (i = 0; i < directives_count; i++)
+        if (strcmp(directives_table[i], input_string) == 0)
+            return 1;
+
+    return 0;
+}
 
 
-/* TODO: implement instruction/directive/register keywords array */
+int is_register_keyword(const char *input_string) {
+    static const char *const registers_talbe[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
+    static const size_t registers_count = sizeof(registers_talbe) / sizeof(registers_talbe[0]);
+    size_t i;
 
-/* TODO: implement keywords functions */
+    if (!input_string)
+        return 0;
+
+    for (i = 0; i < registers_count; i++)
+        if (strcmp(registers_talbe[i], input_string) == 0)
+            return 1;
+
+    return 0;
+}
+
+
+int is_reserved_keyword(const char *input_string) {
+    return is_instruction_keyword(input_string) || is_directive_keyword(input_string) ||
+           is_register_keyword(input_string);
+}
