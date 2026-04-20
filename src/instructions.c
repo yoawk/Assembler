@@ -1,6 +1,6 @@
 /**
  * instructions.c
- * Handles assembly instructions
+ * Responsible for checks and retrievals of the assembly instructions
  */
 
 #include "instructions.h"
@@ -27,9 +27,13 @@ const instruction_entry *get_instruction(const char *inst_name) {
         {"stop", 15, 0, 0, 0, 0}
     };
 
-    static const int instructions_count = sizeof(instructions_table) / sizeof(instructions_table[0]);
-    int i;
+    static const size_t instructions_count = sizeof(instructions_table) / sizeof(instructions_table[0]);
+    size_t i;
 
+    if (!inst_name)
+        return NULL;
+
+    /* Go over the instructions and check for a matching instruction name */
     for (i = 0; i < instructions_count; i++)
         if (strcmp(instructions_table[i].name, inst_name) == 0)
             return &(instructions_table[i]);
@@ -40,6 +44,9 @@ const instruction_entry *get_instruction(const char *inst_name) {
 }
 
 int is_instruction_keyword(const char *input_string) {
+    if (!input_string)
+        return 0;
+
     if (get_instruction(input_string) != NULL)
         return 1;
     return 0;
