@@ -1,11 +1,31 @@
 /**
  * errors.h
  * Header file of errors.c
- * Defines return values and error messages
+ * Includes definition of all return codes.
+ */
+
+/**
+ * Error codes are divided into four groups:
+ *
+ *  Control Flow Codes (non-error):
+ *      Non-error codes that are used for control flow management between functions.
+ *
+ *  Program Errors (fatal):
+ *      Indicate an internal error or input/output fails.
+ *      Will result in program termination.
+ *
+ *  Stage Codes (info messages):
+ *      Used for assembler stage info messages (stage failed/succeeded, etc.)
+ *
+ *  Assembly Errors (non-fatal):
+ *     Indicate a mistake (for example syntax error) in the assembly source file.
+ *     Will only produce a diagnostic error message with error info.
+ *
  */
 
 #ifndef ERRORS_H
 #define ERRORS_H
+
 
 /* The project's return codes type */
 typedef enum {
