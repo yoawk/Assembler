@@ -29,7 +29,10 @@
 
 /* The project's return codes type */
 typedef enum {
-    OK = 0, /* Success code */
+    /* ---- Control Flow Codes ---- */
+
+    OK = 0,      /* Success code */
+    REACHED_EOF, /* Reached End Of File */
 
     /* Stage errors */
     ERR_PRE_ASSEMBLER_FAIL, /* Pre-assembler stage failed */
