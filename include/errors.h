@@ -174,13 +174,20 @@ typedef enum {
 
 
 /**
- * Prints an error message of a given error to stdout.
- * @param error Given error
- * @param context Additional context string. If context is not needed, it'll be ignored.
- * @param file_name Name of the file in which the error occurred. If not needed, it'll be ignored.
- * @param line_number Line number where error occurred (first line number is 1).
- *                      If error is not line related, line_number will be ignored.
+ * Reports errors to stdout and, for fatal program errors, terminates the program.
+ * Should be used for program errors and assembly errors only.
+ * For input assembly errors, file name and line number can be printed for additional context.
+ * @param error The error code to report
+ * @param file_name Name of the source file in which the error occurred. Will be ignored if not needed.
+ * @param line_number Line number (count from 1) where the error was detected. Will be ignored if not needed.
  */
-void print_error(return_val error, const char *context, const char *file_name, unsigned int line_number);
+void handle_error(return_val error, const char *file_name, unsigned int line_number);
+
+/**
+ * Prints info messages to stdout regarding assembler stage.
+ * @param code Stage code
+ * @param file_name File name string
+ */
+void info_message(return_val code, const char *file_name);
 
 #endif
