@@ -34,22 +34,51 @@ typedef enum {
     OK = 0,      /* Success code */
     REACHED_EOF, /* Reached End Of File */
 
-    /* Stage errors */
-    ERR_PRE_ASSEMBLER_FAIL, /* Pre-assembler stage failed */
-    ERR_FIRST_PASS_FAIL,    /* First pass stage failed */
-    ERR_SECOND_PASS_FAIL,   /* Second pass stage failed */
+    /* ---- Program Errors ---- */
 
-    /* General errors */
-    ERR_NULL_PTR,     /* Unexpected NULL pointer */
-    ERR_ALLOC_FAILED, /* Memory allocation failed */
+    /* General program errors */
+    ERR_NULL_PTR,         /* Unexpected NULL pointer */
+    ERR_ALLOC_FAILED,     /* Memory allocation failed - error is severe and execution should be terminated */
+    ERR_REALLOC_FAILED,   /* Memory reallocation failed */
+    ERR_UNEXPECTED_VALUE, /* Found an unexpected value */
 
     /* File/line handling errors */
-    ERR_INVALID_FILE_NAME,     /* TODO: Might be unnecessary */
     ERR_FAILED_TO_OPEN_FILE,   /* File opening failed */
+    ERR_FAILED_TO_CLOSE_FILE,  /* File closing failed */
     ERR_FAILED_TO_WRITE_FILE,  /* File writing failed */
     ERR_FAILED_TO_REMOVE_FILE, /* File removal failed */
-    ERR_LINE_TOO_BIG,          /* Line in input file exceeds MAX_LINE_SIZE */
-    ERR_ONLY_EOF,              /* No bytes left to read */
+
+    /* File-specific errors */
+
+    /* .as file*/
+    ERR_FAILED_TO_OPEN_AS_FOR_READ, /* Failed to open .as file for reading */
+    ERR_FAILED_TO_CLOSE_AS,         /* Failed to close .as file */
+
+    /* .am file */
+    ERR_FAILED_TO_OPEN_AM_FOR_READ,  /* Failed to open .am file for reading */
+    ERR_FAILED_TO_OPEN_AM_FOR_WRITE, /* Failed to open .am file for writing */
+    ERR_FAILED_TO_WRITE_AM,          /* Failed to write to .am file */
+    ERR_FAILED_TO_CLOSE_AM,          /* Failed to close .am file */
+    ERR_FAILED_TO_REMOVE_AM,         /* Failed to remove .am file */
+
+    /* .ob file */
+    ERR_FAILED_TO_OPEN_OB_FOR_WRITE, /* Failed to open .ob file for writing */
+    ERR_FAILED_TO_WRITE_OB,          /* Failed to write to .ob file */
+    ERR_FAILED_TO_CLOSE_OB,          /* Failed to close .ob file */
+    ERR_FAILED_TO_REMOVE_OB,         /* Failed to remove .ob file */
+
+    /* .ent file */
+    ERR_FAILED_TO_OPEN_ENT_FOR_WRITE, /* Failed to open .ent file for writing */
+    ERR_FAILED_TO_WRITE_ENT,          /* Failed to write to .ent file */
+    ERR_FAILED_TO_CLOSE_ENT,          /* Failed to close .ent file */
+    ERR_FAILED_TO_REMOVE_ENT,         /* Failed to remove .ent file */
+
+    /* .ext file */
+    ERR_FAILED_TO_OPEN_EXT_FOR_WRITE, /* Failed to open .ext file for writing */
+    ERR_FAILED_TO_WRITE_EXT,          /* Failed to write to .ext file */
+    ERR_FAILED_TO_CLOSE_EXT,          /* Failed to close .ext file */
+    ERR_FAILED_TO_REMOVE_EXT,         /* Failed to remove .ext file */
+
 
     /* Macro errors */
     ERR_MACRO_NAME_DUPLICATE,    /* Macro name in a macro definition start is an existing macro name */
