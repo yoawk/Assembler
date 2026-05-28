@@ -80,6 +80,23 @@ typedef enum {
     ERR_FAILED_TO_REMOVE_EXT,         /* Failed to remove .ext file */
 
 
+    /* ---- Stage Codes ---- */
+
+    /* Stage start */
+    PRE_ASSEMBLER_START, /* Pre-assembler stage started */
+    FIRST_PASS_START,    /* First pass stage started */
+    SECOND_PASS_START,   /* Second pass stage started */
+
+    /* Stage failure */
+    PRE_ASSEMBLER_FAIL, /* Pre-assembler stage failed */
+    FIRST_PASS_FAIL,    /* First pass stage failed */
+    SECOND_PASS_FAIL,   /* Second pass stage failed */
+
+    /* Stage completion */
+    PRE_ASSEMBLER_SUCCESS, /* Pre-assembler stage finished successfully */
+    FIRST_PASS_SUCCESS,    /* First pass stage finished successfully */
+    SECOND_PASS_SUCCESS,   /* Second pass stage finished successfully */
+
     /* Macro errors */
     ERR_MACRO_NAME_DUPLICATE,    /* Macro name in a macro definition start is an existing macro name */
     ERR_MACRO_NAME_RESERVED,     /* Macro name in macro definition start is a reserved keyword (instruction, directive, register) */
