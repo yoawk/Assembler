@@ -97,13 +97,79 @@ typedef enum {
     FIRST_PASS_SUCCESS,    /* First pass stage finished successfully */
     SECOND_PASS_SUCCESS,   /* Second pass stage finished successfully */
 
+
+
+    /* ---- Assembly Errors ---- */
+
+    /* Line errors */
+    ERR_LINE_TOO_BIG,      /* Line in input file exceeds MAX_LINE_SIZE */
+    ERR_UNKNOWN_LINE_TYPE, /* Line wasn't identified as an empty, comment, instruction or directive line */
+
     /* Macro errors */
     ERR_MACRO_NAME_DUPLICATE,    /* Macro name in a macro definition start is an existing macro name */
     ERR_MACRO_NAME_RESERVED,     /* Macro name in macro definition start is a reserved keyword (instruction, directive, register) */
     ERR_MACRO_NAME_EMPTY,        /* Macro name in macro definition start is empty*/
     ERR_CHARS_AFTER_MACRO_START, /* Non-white characters appear after macro definition start */
     ERR_CHARS_AFTER_MACRO_END,   /* Non-white characters appear after macro definition end */
-    ERR_CHARS_AFTER_MACRO_REF    /* Non-white characters appear after macro reference */
+    ERR_CHARS_AFTER_MACRO_REF,   /* Non-white characters appear after macro reference */
+
+    /* Symbol/Label errors */
+    ERR_SYMBOL_NAME_TOO_BIG,           /* Symbol name exceeds MAX_SYMBOL_NAME_SIZE */
+    ERR_SYMBOL_NAME_EMPTY,             /* Symbol name is empty */
+    ERR_SYMBOL_NAME_RESERVED,          /* Symbol name collides with a reserved keyword */
+    ERR_SYMBOL_FIRST_CHAR,             /* First character of symbol name is not a letter (upper or lower) */
+    ERR_SYMBOL_NON_ALPHANUMERIC,       /* Symbol name contains non-alphanumeric characters */
+    ERR_SYMBOL_IS_MACRO_NAME,          /* Symbol name is a defined macro's name */
+    ERR_SYMBOL_LABEL_ALREADY_EXISTS,   /* A label's symbol name is already defined elsewhere */
+    ERR_SYMBOL_EXTERN_ALREADY_DEFINED, /* A .extern's symbol name is already defined as a non-extern symbol */
+    ERR_SYMBOL_ENTRY_IS_EXTERNAL,      /* A .entry symbol name is already defined as an external symbol */
+    ERR_SYMBOL_DOES_NOT_EXIST,         /* A referenced symbol does not exist */
+
+    /* Instruction errors */
+    ERR_MISSING_OPERANDS,       /* Instruction expected more operands*/
+    ERR_TOO_MANY_OPERANDS,      /* Instruction expected fewer operands */
+    ERR_INVALID_ADDR_MODE,      /* Encountered some operand of an invalid addressing mode */
+    ERR_INVALID_SRC_ADDR_MODE,  /* The source operand is of an invalid addressing mode */
+    ERR_INVALID_DEST_ADDR_MODE, /* The destination operand is of an invalid addressing mod */
+
+
+    /* Operands errors */
+    ERR_IMMEDIATE_OUT_OF_RANGE, /* Immediate value is out of valid range */
+    ERR_IMMEDIATE_EMPTY,        /* No characters after the IMMEDIATE_PREFIX_CHAR */
+    ERR_IMMEDIATE_UNKNOWN,      /* Couldn't identify immediate value */
+    ERR_RELATIVE_EMPTY,         /* Relative symbol is empty */
+    ERR_RELATIVE_IS_EXTERNAL,   /* An operand with relative addressing mode is an external symbol */
+    ERR_EMPTY_OPERAND,          /* Operand is empty */
+
+    /* Directive .data errors */
+    ERR_DIRECTIVE_DATA_LIST_TOO_SMALL, /* Data directive's integers list is too small */
+    ERR_DIRECTIVE_DATA_LIST_TOO_BIG,   /* Data directive's integers list exceeds max length */
+    ERR_DATA_LIST_VALUE_UNKNOWN,       /* A data directive's integer is of unknown invalid value */
+    ERR_DATA_LIST_VALUE_TOO_SMALL,     /* A .data directive's integer value is too small */
+    ERR_DATA_LIST_VALUE_TOO_BIG,       /* A .data directive's integer value is too big*/
+
+    /* Directive .string errors */
+    ERR_DIRECTIVE_STRING_NO_START_QUOTE,      /* A .string's content doesn't start with '"' */
+    ERR_DIRECTIVE_STRING_NO_END_QUOTE,        /* A .string's content doesn't end with '"' */
+    ERR_DIRECTIVE_STRING_INVALID_CHAR,        /* A .string's content string contains a character which is not a printable ASCII character */
+    ERR_DIRECTIVE_STRING_CONTENT_TOO_SMALL,   /* A .string's content string is too small */
+    ERR_DIRECTIVE_STRING_CONTENT_TOO_BIG,     /* A .string's content string is too big */
+    ERR_DIRECTIVE_STRING_CHARS_AFTER_CONTENT, /* A non-white character appeared after the .string content string */
+
+    /* Directive .extern errors */
+    ERR_DIRECTIVE_EXTERN_MISSING_SYMBOL,     /* A .extern directive line is missing a symbol */
+    ERR_DIRECTIVE_EXTERN_CHARS_AFTER_SYMBOL, /* A .extern line has non-white characters after symbol */
+
+    /* directive .entry errors */
+    ERR_DIRECTIVE_ENTRY_MISSING_SYMBOL,     /* A .entry directive line is missing a symbol */
+    ERR_DIRECTIVE_ENTRY_CHARS_AFTER_SYMBOL, /* A .entry directive line has non-white characters after symbol */
+
+    /* Parameter lists errors (for both operands and directives) */
+    ERR_NO_NAME,         /* First string sequence wasn't found */
+    ERR_EARLY_COMMA,     /* Comma before any parameters */
+    ERR_MULTIPLE_COMMAS, /* Multiple commas instead of one */
+    ERR_EXTRA_COMMA,     /* A comma after last parameter */
+    ERR_MISSING_COMMA    /* No comma between parameters */
 } return_val;
 
 
