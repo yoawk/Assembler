@@ -6,20 +6,17 @@
  */
 
 #include "pre_assembler.h"
-#include "utils.h"
 #include "globals.h"
 #include "handle_file.h"
-#include "keywords.h"
+#include "macros.h"
+#include "utils.h"
 
+#include <stdlib.h>
 #include <string.h>
-
-
-/* Macro start/end keywords */
-#define MACRO_START "mcro"
-#define MACRO_END "mcroend"
 
 /* Comment line prefix character */
 #define COMMENT_LINE_CHAR ';'
+
 
 /**
  * Checks if a given line is a comment line.
@@ -34,9 +31,7 @@ return_val is_comment_line(const char *line, int *result);
 
 int is_macro_start(const char *line);
 
-int is_macro_end(const char *line);
 
-int is_valid_macro_name(const char *name);
 
 return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro_table_p) {
     int found_error;                          /* Indicates if an error has already occurred */
