@@ -29,7 +29,6 @@
  */
 return_val is_comment_line(const char *line, int *result);
 
-int is_macro_start(const char *line);
 
 
 
@@ -195,21 +194,7 @@ return_val is_comment_line(const char *line, int *result) {
 }
 
 
- return OK;
-}
 
 
 
-}
 
-int is_macro_start(const char *line) {
-    /* TODO: Make sure valid line doesn't have trailing non-white characters */
-}
-
-int is_macro_end(const char *line) {
-    /* TODO: Make sure valid line doesn't have trailing non-white characters */
-}
-
-int is_valid_macro_name(const char *name) {
-    /* TODO: Think of a way to implement saved keyword list */
-}
