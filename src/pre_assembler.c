@@ -48,40 +48,28 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
     }
 
     /* Set curr_file_name to the name of the .as file */
-    curr_file_name = (char *) malloc(strlen(assembly_file_name) + strlen(".as") + 1);
-    if (!curr_file_name) {
-        print_error(ERR_ALLOC_FAILED, NULL, NULL, 0);
-        return ERR_PRE_ASSEMBLER_FAIL;
-    }
+    curr_file_name = malloc_helper(strlen(assembly_file_name) + strlen(AS_FILE_EXTENSION) + 1);
     strcpy(curr_file_name, assembly_file_name);
-    strcat(curr_file_name, ".as");
+    strcat(curr_file_name, AS_FILE_EXTENSION);
 
-    rv = fopen_helper(assembly_file_name, ".as", "r", &old_fp);
+    /* Open .as file for reading */
+    rv = fopen_helper(assembly_file_name, AS_FILE_EXTENSION, "r", &as_fp);
     /* If an error occurred when opening the .as file, give additional info */
     if (rv == ERR_FAILED_TO_OPEN_FILE) {
-        print_error(rv, "failed to read .as file", NULL, 0);
-        free(curr_file_name);
-        return ERR_PRE_ASSEMBLER_FAIL;
+        handle_error(ERR_FAILED_TO_OPEN_AS_FOR_READ, NULL, 0);
     }
     else if (rv != OK) {
-        print_error(rv, NULL, NULL, 0);
-        free(curr_file_name);
-        return ERR_PRE_ASSEMBLER_FAIL;
+        handle_error(rv, NULL, 0);
     }
 
-    rv = fopen_helper(assembly_file_name, ".am", "w", &new_fp);
+    /* Open .am file for writing */
+    rv = fopen_helper(assembly_file_name, AM_FILE_EXTENSION, "w", &am_fp);
     /* If an error occurred when opening the .am file, give additional info */
     if (rv == ERR_FAILED_TO_OPEN_FILE) {
-        fclose(old_fp);
-        print_error(rv, "failed to write to the .am file", NULL, 0);
-        free(curr_file_name);
-        return ERR_PRE_ASSEMBLER_FAIL;
+        handle_error(ERR_FAILED_TO_OPEN_AM_FOR_WRITE, NULL, 0);
     }
     else if (rv != OK) {
-        fclose(old_fp);
-        print_error(rv, NULL, NULL, 0);
-        free(curr_file_name);
-        return ERR_PRE_ASSEMBLER_FAIL;
+        handle_error(rv, NULL, 0);
     }
 
 
