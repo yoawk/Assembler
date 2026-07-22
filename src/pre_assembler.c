@@ -133,16 +133,36 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
             continue;
         }
 
-        /* TODO: implement */
-        /* Otherwise, if no error has been encountered yet, current line should be simply copied */
-        else if (!found_error){
+        /* If a macro definition hasn't been finished yet */
+        else if (macro_flag == 1) {
+            /* If the macro ending keyword is encountered, turn off macro flag */
+            rv = is_macro_end(line_buffer, &result);
+            if (rv != OK) {
+                handle_error(rv, curr_file_name, line_count);
+                found_error = 1;
+                continue;
+            }
+            else if (result == 1) {
+                macro_flag = 0;
+                continue;
+            }
 
+            /* Otherwise, add the current line into the current macro's content */
+            else {
+                /* Note that it is assumed that no nested macro definitions exist,
+                 * and therefore the last inserted macro entry to table points to the currently defined macro entry */
+                rv = add_macro_content(macro_table_p->macro_entries[macro_table_p->macro_count - 1], line_buffer);
+                if (rv != OK) {
+                    handle_error(rv, NULL, 0);
+                }
+
+                /* Line content was successfully added to macro entry's content. Go to next line */
+                continue;
+            }
         }
 
 
-        /*TODO:
-         * check if mcro, mcroend, comment, empty
-         */
+        /* Otherwise, current line should be simply copied to .am file or expanded in the case of a macro reference */
 
     }
 
