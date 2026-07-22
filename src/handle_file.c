@@ -4,8 +4,10 @@
  */
 
 #include "handle_file.h"
+
 #include "utils.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 /**
@@ -36,7 +38,7 @@ return_val get_line(char *output_line, size_t max_size, FILE *fp) {
 
     /* No bytes were read and EOF has been reached */
     else if (feof(fp))
-        return ERR_ONLY_EOF;
+        return REACHED_EOF;
 
     /* New line character was not found within max_size + 1 characters */
     else {
@@ -51,16 +53,14 @@ return_val fopen_helper(const char *file_name, const char *file_extension, const
     if (!file_name || !file_extension || !mode)
         return ERR_NULL_PTR;
 
-    concat_name = (char *) malloc(strlen(file_name) + strlen(file_extension) + 1);
-    if (!concat_name)
-        return ERR_ALLOC_FAILED;
+    concat_name = (char *) malloc_helper(strlen(file_name) + strlen(file_extension) + 1);
     strcpy(concat_name, file_name);
 
     strcat(concat_name, file_extension);
 
     *fp = fopen(concat_name, mode);
     free(concat_name);
-    if (!*fp)
+    if (!(*fp))
         return ERR_FAILED_TO_OPEN_FILE;
 
     return OK;
@@ -73,9 +73,7 @@ return_val remove_helper(const char *file_name, const char *file_extension) {
         return ERR_NULL_PTR;
 
     /* Concatenate file_name and file_extension into concat_name */
-    concat_name = (char *) malloc(strlen(file_name) + strlen(file_extension) + 1);
-    if (!concat_name)
-        return ERR_ALLOC_FAILED;
+    concat_name = (char *) malloc_helper(strlen(file_name) + strlen(file_extension) + 1);
     strcpy(concat_name, file_name);
     strcat(concat_name, file_extension);
 
@@ -99,7 +97,6 @@ int is_empty_line(const char *line) {
 
     return 1;
 }
-
 
 void cleanup_line(FILE *fp) {
     while (getc(fp) != '\n' && !feof(fp));
@@ -134,9 +131,7 @@ return_val get_nth_token(const char *line, int n, char **token) {
 
         if (token_count == n) {
             token_len = p - start + 1;       /* Size of token including '\0' */
-            *token = (char *) malloc(token_len);
-            if (!*token)
-                return ERR_ALLOC_FAILED;
+            *token = (char *) malloc_helper(token_len);
 
             /* Copy nth token string into token and add null character */
             memcpy(*token, start, token_len - 1);
