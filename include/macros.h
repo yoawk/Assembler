@@ -71,6 +71,16 @@ return_val add_macro_content(macro_entry *input_macro, char *line);
 return_val init_macro_table(macro_table *macro_table_p);
 
 /**
+ * Clears a macro table by freeing the dynamically allocated content (not the macro table structure itself) of a valid macro table.
+ * Also sets macro_entries to NULL and macro_count to 0.
+ * Behavior is undefined if macro table or its entries contain invalid NULL pointers.
+ *
+ * @param macro_table_p Pointer to the macro table
+ * @return OK on success. ERR_NULL_PTR on an unexpected NULL pointer
+ */
+return_val clear_macro_table(macro_table *macro_table_p);
+
+/**
  * Adds a specified macro entry into the macro table.
  * Macro name and content shouldn't be freed by caller.
  * Behavior is undefined if macro table isn't initialized correctly,

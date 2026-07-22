@@ -177,6 +177,27 @@ return_val init_macro_table(macro_table *macro_table_p) {
     return OK;
 }
 
+return_val clear_macro_table(macro_table *macro_table_p) {
+    unsigned int i;
+    macro_entry *curr_entry;
+
+    if (!macro_table_p)
+        return ERR_NULL_PTR;
+
+    /* Free macro entries */
+    if (macro_table_p->macro_entries) {
+        for (i = 0; i < macro_table_p->macro_count; i++) {
+            curr_entry = (macro_table_p->macro_entries)[i];
+            if (!curr_entry)
+                return ERR_NULL_PTR;
+
+            free(curr_entry->name);
+            free(curr_entry->macro_content); /* Might be NULL */
+            free(curr_entry);
+        }
+        free(macro_table_p->macro_entries);
+    }
+
     macro_table_p->macro_entries = NULL;
     macro_table_p->macro_count = 0;
 
