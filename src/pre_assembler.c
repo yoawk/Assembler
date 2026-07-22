@@ -29,6 +29,20 @@
  */
 return_val is_comment_line(const char *line, int *result);
 
+/**
+ * Pre-assembler helper function.
+ * Copies a line into the .am file and if it's a macro reference, expands the macro into .am instead.
+ * Behavior is undefined if given file pointer doesn't point to an open file with write permissions,
+ * or if given macro table is invalid.
+ * @param line_buffer Line to copy (or expand) to .am file
+ * @param am_fp .am file pointer
+ * @param macro_table_p Pointer to macro table
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_CHARS_AFTER_MACRO_RED if non-white characters appear after macro reference line.
+ *          ERR_FAILED_TO_WRITE_AM if .am file writing failed.
+ */
+return_val pre_assembler_handle_am_file_write(const char *line_buffer, FILE *am_fp, const macro_table *macro_table_p);
+
 return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro_table_p) {
     return_val rv; /* Used for general return_val values */
     int result;    /* Used for general integer result values */
@@ -163,8 +177,17 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
 
 
         /* Otherwise, current line should be simply copied to .am file or expanded in the case of a macro reference */
+        rv = pre_assembler_handle_am_file_write(line_buffer, am_fp, macro_table_p);
+        if (rv != OK) {
+            handle_error(rv, curr_file_name, line_count);
+            found_error = 1;
+            continue;
+        }
 
+        /* Go to next line */
+        continue;
     }
+
 
     /* Free previously allocated memory and close files */
 
@@ -212,8 +235,44 @@ return_val is_comment_line(const char *line, int *result) {
     return OK;
 }
 
+return_val pre_assembler_handle_am_file_write(const char *line_buffer, FILE *am_fp, const macro_table *macro_table_p) {
+    return_val rv;
+    macro_entry *expanded_macro_entry;
+    size_t write_size, written_size;
 
+    if (!line_buffer || !macro_table_p || !am_fp)
+        return ERR_NULL_PTR;
 
+    /* If line is a macro reference */
+    rv = is_valid_macro_reference(line_buffer, macro_table_p, &expanded_macro_entry);
+    if (rv != OK) {
+        return rv;
+    }
+    /* If current line is a macro reference line, expand it into the .am file */
+    else if (expanded_macro_entry != NULL) {
+        /* If expanded macro has empty content, expansion is skipped */
+        if (expanded_macro_entry->macro_content == NULL)
+            return OK;
 
+        write_size = strlen(expanded_macro_entry->macro_content);
+        written_size = fwrite(expanded_macro_entry->macro_content, sizeof(char), write_size, am_fp);
+        /* If write failed */
+        if (written_size < write_size) {
+            return ERR_FAILED_TO_WRITE_AM;
+        }
 
+        return OK;
+    }
 
+    /* Otherwise, copy current line into the .am file */
+    else {
+        write_size = strlen(line_buffer);
+        written_size = fwrite(line_buffer, sizeof(char), write_size, am_fp);
+        /* If write failed */
+        if (written_size < write_size) {
+            return ERR_FAILED_TO_WRITE_AM;
+        }
+
+        return OK;
+    }
+}
