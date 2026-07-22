@@ -83,4 +83,30 @@ return_val init_macro_table(macro_table *macro_table_p);
  */
 return_val add_macro_to_table(char *macro_name, char *macro_content, macro_table *macro_table_p);
 
+/**
+ * Checks if a string is a macro name of an entry in a macro table
+ * and if so, returns the macro entry.
+ * Behavior is undefined if macro table is not valid.
+ * @param input_string Input string
+ * @param macro_table_p Given macro table pointer
+ * @return If string matches with a macro's name, corresponding macro entry will be returned.
+ *          Otherwise, if there are no matches, or if a NULL pointer was passed, returns NULL.
+ */
+macro_entry *is_in_macro_table(const char *input_string, const macro_table *macro_table_p);
+
+/**
+ * Check if a given line is a valid macro reference line.
+ * Macro reference lines should appear after the respective macro definition
+ * and shouldn't have trailing non-white characters.
+ * If line is a macro reference and no errors were encountered,
+ * then output_macro_entry will point at the respective macro entry.
+ * If line is not a macro reference, will try to point output_macro_entry at NULL.
+ * @param line Given line
+ * @param curr_macro_table Current macro table
+ * @param output_macro_entry Pointer to the output macro entry
+ * @return OK on success, ERR_NULL_PTR on NULL pointer input,
+ *          ERR_CHARS_AFTER_MACRO_REF on non-white trailing characters.
+ */
+return_val is_valid_macro_reference(const char *line, const macro_table *curr_macro_table, macro_entry **output_macro_entry);
+
 #endif

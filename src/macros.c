@@ -218,3 +218,67 @@ return_val add_macro_to_table(char *macro_name, char *macro_content, macro_table
     return OK;
 }
 
+macro_entry *is_in_macro_table(const char *input_string, const macro_table *macro_table_p) {
+    unsigned int i;
+
+    if (!input_string || !macro_table_p)
+        return NULL;
+
+    /* Go over macro table entries and comapre their names with input string */
+    for (i = 0; i < macro_table_p->macro_count; i++) {
+        if (strcmp(input_string, (macro_table_p->macro_entries)[i]->name) == 0) {
+            return (macro_table_p->macro_entries)[i];
+        }
+    }
+
+    return NULL;
+}
+
+return_val is_valid_macro_reference(const char *line, const macro_table *curr_macro_table, macro_entry **output_macro_entry) {
+    return_val rv;
+    char *token_string; /* Used to hold non-white characters sequences of line */
+
+    if (!line || !curr_macro_table || !output_macro_entry)
+        return ERR_NULL_PTR;
+
+    /* Get the first sequence of line */
+    rv = get_nth_token(line, 1, &token_string);
+    if (rv != OK) {
+        *output_macro_entry = NULL;
+        return rv;
+    }
+
+    /* If no sequence was found, then line is not a macro reference */
+    if (!token_string) {
+        *output_macro_entry = NULL;
+        return OK;
+    }
+
+    /* Otherwise, check if the first sequence is a previously defined macro name */
+    *output_macro_entry = is_in_macro_table(token_string, curr_macro_table);
+    if (*output_macro_entry) {
+        free(token_string);
+
+        /* Check if there is more than one sequence in the line */
+        rv = get_nth_token(line, 2, &token_string);
+        if (rv != OK) {
+            *output_macro_entry = NULL;
+            return rv;
+        }
+
+        /* If there is more than one non-white characters sequence in the line,
+         * then the macro reference is invalid */
+        if (token_string != NULL) {
+            *output_macro_entry = NULL;
+            free(token_string);
+            return ERR_CHARS_AFTER_MACRO_REF;
+        }
+
+        /* Otherwise, macro reference is valid and output_macro_entry is set (by is_in_macro_table) */
+        return OK;
+    }
+
+    /* Otherwise, if *output_macro_entry is NULL, first sequence of line is not a defined macro name */
+    free(token_string);
+    return OK;
+}
