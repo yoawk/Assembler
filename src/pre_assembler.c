@@ -77,15 +77,10 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
     found_error = 0;
     macro_flag = 0;
     line_count = 0;
-    while (1) {
+    while ((rv = get_line(line_buffer, MAX_LINE_SIZE, as_fp)) != REACHED_EOF) {
         line_count++;
-
-        rv = get_line(line_buffer, MAX_LINE_SIZE, old_fp);
-        /* If no bytes were left to read, exit loop */
-        if (rv == ERR_ONLY_EOF)
-            break;
-        else if (rv != OK) {
-            print_error(rv, NULL, curr_file_name, line_count);
+        if (rv != OK) {
+            handle_error(rv, curr_file_name, line_count);
             found_error = 1;
             continue;
         }
