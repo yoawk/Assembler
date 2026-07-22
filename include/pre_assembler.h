@@ -7,16 +7,7 @@
 #define PRE_ASSEMBLER_H
 
 #include "errors.h"
-
-typedef struct {
-    char *macro_name;
-    char *macro_content;
-} macro_entry;
-
-typedef struct {
-    macro_entry **macro_entries;
-    unsigned int macro_count;
-} macro_table;
+#include "macros.h"
 
 
 /**
