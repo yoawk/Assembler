@@ -29,22 +29,22 @@
  */
 return_val is_comment_line(const char *line, int *result);
 
-
-
-
 return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro_table_p) {
-    int found_error;                          /* Indicates if an error has already occurred */
-    int macro_flag;                           /* Flag that signals if we're inside a macro definition */
-    char *curr_file_name;                     /* Holds the .as file name for printing errors */
-    unsigned int line_count;                  /* Used for tracking current line count*/
-    FILE *old_fp, *new_fp;                    /* File descriptors for old .as file and new .am file */
-    int result;                               /* Used for general integer result values */
-    return_val rv;                            /* Used for general return_val values */
-    char line_buffer[MAX_LINE_SIZE + 2];      /* Additional 2 bytes for '\n' and '\0' characters */
+    return_val rv; /* Used for general return_val values */
+    int result;    /* Used for general integer result values */
 
-    if (!macro_table_p) {
-        print_error(ERR_NULL_PTR, NULL, NULL, 0);
-        return ERR_PRE_ASSEMBLER_FAIL;
+    int found_error;      /* Indicates if an error has already occurred */
+    char *curr_file_name; /* Holds the .as file name for printing errors */
+    FILE *as_fp, *am_fp;  /* File descriptors for old .as file and new .am file */
+
+    char line_buffer[MAX_LINE_SIZE + 2]; /* Additional 2 bytes for '\n' and '\0' characters */
+    unsigned int line_count;             /* Used for tracking current line count*/
+
+    int macro_flag;        /* Flag that signals if we're inside a macro definition */
+    char *curr_macro_name; /* Holds the currently defined macro name */
+
+    if (!assembly_file_name || !macro_table_p) {
+        handle_error(ERR_NULL_PTR, NULL, 0);
     }
 
     /* Set curr_file_name to the name of the .as file */
