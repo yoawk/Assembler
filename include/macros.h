@@ -54,6 +54,13 @@ return_val is_macro_start(const char *line, char **macro_name, const macro_table
  */
 return_val is_macro_end(const char *line, int *result);
 
+/**
+ * Update a macro's content string by adding a new line
+ * @param input_macro Given macro
+ * @param line Given line to add to macro's content
+ * @return OK on success, ERR_NULL_PTR on NULL pointer input.
+ */
+return_val add_macro_content(macro_entry *input_macro, char *line);
 
 /**
  * Initializes an empty macro table structure,

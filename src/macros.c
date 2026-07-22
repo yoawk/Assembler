@@ -142,6 +142,29 @@ return_val is_macro_end(const char *line, int *result) {
     return OK;
 }
 
+return_val add_macro_content(macro_entry *input_macro, char *line) {
+    size_t line_len;
+
+    if (!input_macro || !line)
+        return ERR_NULL_PTR;
+
+    line_len = strlen(line);
+
+    /* If input_macro's content is currently empty, initialize it with line */
+    if (input_macro->macro_content == NULL) {
+        input_macro->macro_content = (char *) malloc_helper(line_len + 1);
+        strcpy(input_macro->macro_content, line);
+        return OK;
+    }
+
+    /* Otherwise, input_macro's content is already initialized, line should be appended */
+    else {
+        input_macro->macro_content = (char *) realloc_helper(input_macro->macro_content, strlen(input_macro->macro_content) + line_len + 1);
+        strcat(input_macro->macro_content, line);
+
+        return OK;
+    }
+}
 
 return_val init_macro_table(macro_table *macro_table_p) {
     if (!macro_table_p)
