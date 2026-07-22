@@ -24,7 +24,7 @@
  * @param line Input line
  * @param result Pointer to the result value: 1 if given line is a comment line, 0 if it's not
  * @return OK on success.
- *          ERR_ALLOC_FAILED on memory allocation fail and ERR_NULL_PTR on NULL pointer input,
+ *          ERR_NULL_PTR on NULL pointer input,
  *          in which case value pointed by result should be ignored.
  */
 return_val is_comment_line(const char *line, int *result);
@@ -97,7 +97,7 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
         /* If line is a comment, skip it */
         rv = is_comment_line(line_buffer, &result);
         if (rv != OK) {
-            print_error(rv, NULL, curr_file_name, line_count);
+            handle_error(rv, curr_file_name, line_count);
             found_error = 1;
             continue;
         }
@@ -154,26 +154,22 @@ return_val is_comment_line(const char *line, int *result) {
     return_val rv;
     char *token_string; /* Used for storing a non-white character sequence of line */
 
-    /* Initialize result value to -1 to avoid function misuse of the caller */
-    *result = -1;
-
-    if (!line)
+    if (!line || !result)
         return ERR_NULL_PTR;
+
+    /* Initialize result to avoid function misuse of the caller */
+    *result = 0;
 
     /* Get first token string of line */
     rv = get_nth_token(line, 1, &token_string);
     if (rv != OK)
         return rv;
 
-    /* If there is no token in the line (it's empty) */
-    if (!token_string)
-        *result = 0;
-
-    /* If a first token exists, and it begins with COMMENT_LINE_CHAR then it's a comment line */
-    else if (token_string[0] == COMMENT_LINE_CHAR)
+        /* If a first token exists, and it begins with COMMENT_LINE_CHAR then it's a comment line */
+    else if (token_string != NULL && token_string[0] == COMMENT_LINE_CHAR)
         *result = 1;
 
-    /* Otherwise, a first token exists, but it's not a comment line */
+        /* Otherwise, it's not a comment line */
     else
         *result = 0;
 
