@@ -73,6 +73,12 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
     }
 
 
+    /* Initialize macro table */
+    rv = init_macro_table(macro_table_p);
+    if (rv != OK)
+        handle_error(rv, NULL, 0);
+
+
     /* Initialize flags and line count */
     found_error = 0;
     macro_flag = 0;
@@ -84,6 +90,9 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
             found_error = 1;
             continue;
         }
+
+        /* Initialize helper variables to avoid misuse */
+        curr_macro_name = NULL;
 
         /* If line is empty, skip it */
         if (is_empty_line(line_buffer))
@@ -100,17 +109,28 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
             continue;
 
 
-        /* TODO: implement */
-        /* If a macro definition hasn't been finished yet */
-        if (macro_flag == 1) {
-            /* If the macro ending keyword is encountered */
+        /* Check if line is a macro definition start */
+        rv = is_macro_start(line_buffer, &curr_macro_name, macro_table_p);
 
+        /* If an error occurred */
+        if (rv != OK) {
+            handle_error(rv, curr_file_name, line_count);
+            found_error = 1;
+            continue;
         }
+        /* Otherwise, if line is a macro definition start (signaled by output macro name's value),
+         * create corresponding macro entry and add it to macro table. */
+        else if (curr_macro_name) {
+            /* Add macro entry (with empty content and macro_name name) to macro table */
+            rv = add_macro_to_table(curr_macro_name, NULL, macro_table_p);
+            if (rv != OK)
+                handle_error(rv, NULL, 0);
 
-        /* TODO: implement */
-        /* If a macro definition start keyword is encountered */
-        else if (is_macro_start(line_buffer)) {
-            /* Check if macro's name is valid (not the same as a saved keyword) */
+            /* Turn on macro flag */
+            macro_flag = 1;
+
+            /* Handling was successful. Read next line */
+            continue;
         }
 
         /* TODO: implement */
