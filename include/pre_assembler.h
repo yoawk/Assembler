@@ -25,13 +25,8 @@
  *
  * @param assembly_file_name The file name of the input .as file (and, if produced, .am file) without the .as extension.
  * @param macro_table_p Pointer to an empty macro table that will be overridden and filled with macro entries.
- *                      Freed by the caller. If ERR_PRE_ASSEMBLER_FAIL is returned, the macro table's data should be ignored.
- * @return OK on success, ERR_PRE_ASSEMBLER_FAIL on any error.
+ * @return PRE_ASSEMBLER_SUCCESS on success. PRE_ASSEMBLER_FAIL on detected assembly error.
  */
 return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro_table_p);
-
-
-
-
 
 #endif
