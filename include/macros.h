@@ -55,4 +55,25 @@ return_val is_macro_start(const char *line, char **macro_name, const macro_table
 return_val is_macro_end(const char *line, int *result);
 
 
+/**
+ * Initializes an empty macro table structure,
+ * such that the macro entries array will be NULL and macro count will be 0.
+ * @param macro_table_p Pointer to the to-be initialized macro table
+ * @return OK on success. ERR_NULL_PTR on an unexpected NULL pointer.
+ */
+return_val init_macro_table(macro_table *macro_table_p);
+
+/**
+ * Adds a specified macro entry into the macro table.
+ * Macro name and content shouldn't be freed by caller.
+ * Behavior is undefined if macro table isn't initialized correctly,
+ * or if macro entry values are invalid.
+ *
+ * @param macro_name Macro name
+ * @param macro_content Macro's content (can be NULL for empty)
+ * @param macro_table_p Pointer to macro table
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ */
+return_val add_macro_to_table(char *macro_name, char *macro_content, macro_table *macro_table_p);
+
 #endif

@@ -142,3 +142,56 @@ return_val is_macro_end(const char *line, int *result) {
     return OK;
 }
 
+
+return_val init_macro_table(macro_table *macro_table_p) {
+    if (!macro_table_p)
+        return ERR_NULL_PTR;
+
+    /* Initialize macro table */
+    macro_table_p->macro_entries = NULL;
+    macro_table_p->macro_count = 0;
+
+    return OK;
+}
+
+    macro_table_p->macro_entries = NULL;
+    macro_table_p->macro_count = 0;
+
+    return OK;
+}
+
+return_val add_macro_to_table(char *macro_name, char *macro_content, macro_table *macro_table_p) {
+    macro_entry *temp_macro_entry;
+
+    /* Macro content can be NULL */
+    if (!macro_name || !macro_table_p)
+        return ERR_NULL_PTR;
+
+    /* Allocate memory for new macro entry */
+    temp_macro_entry = (macro_entry *) malloc_helper(sizeof(macro_entry));
+
+    /* Initialize macro entry */
+    temp_macro_entry->name = macro_name;
+    temp_macro_entry->macro_content = macro_content;
+
+    /* Add macro entry to macro table */
+
+    /* If the macro table already has macro entries, extend it for the new macro entry */
+    if (macro_table_p->macro_entries != NULL) {
+        /* If program was not terminated, then reallocation was successful */
+        macro_table_p->macro_entries = (macro_entry **) realloc_helper(macro_table_p->macro_entries,
+                                                      sizeof(macro_entry *) * (macro_table_p->macro_count + 1));
+    }
+
+    /* Otherwise, allocate new memory chunk for macro entries */
+    else {
+        macro_table_p->macro_entries = (macro_entry **) malloc_helper(sizeof(macro_entry *));
+    }
+
+    /* Add the new macro entry to the table and update macro count */
+    (macro_table_p->macro_entries)[macro_table_p->macro_count] = temp_macro_entry;
+    macro_table_p->macro_count++;
+
+    return OK;
+}
+
