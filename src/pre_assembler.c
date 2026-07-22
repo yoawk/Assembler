@@ -191,21 +191,29 @@ return_val pre_assembler_loop(const char *assembly_file_name, macro_table *macro
 
     /* Free previously allocated memory and close files */
 
-    fclose(old_fp);
-    fclose(new_fp);
-
-    /* If an error occurred during the stage, delete the .am file, free the macro table, and report fail */
-    if (found_error) {
-        rv = remove_helper(assembly_file_name, ".am");
-        if (rv != OK)
-            print_error(rv, "failed to remove the .am file", curr_file_name, 0);
-
-        free(curr_file_name);
-        return ERR_PRE_ASSEMBLER_FAIL;
+    if (fclose(as_fp)) {
+        handle_error(ERR_FAILED_TO_CLOSE_AS, NULL, 0);
+    }
+    if (fclose(am_fp)) {
+        handle_error(ERR_FAILED_TO_CLOSE_AM, NULL, 0);
     }
 
     free(curr_file_name);
-    return OK;
+
+    /* If an error occurred during the stage, delete the .am file, free the macro table, and report fail */
+    if (found_error == 1) {
+        rv = remove_helper(assembly_file_name, AM_FILE_EXTENSION);
+        if (rv != OK)
+            handle_error(ERR_FAILED_TO_REMOVE_AM, NULL, 0);
+
+        rv = clear_macro_table(macro_table_p);
+        if (rv != OK)
+            handle_error(rv, NULL, 0);
+
+        return PRE_ASSEMBLER_FAIL;
+    }
+
+    return PRE_ASSEMBLER_SUCCESS;
 }
 
 return_val is_comment_line(const char *line, int *result) {
