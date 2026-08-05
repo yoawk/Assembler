@@ -345,3 +345,64 @@ void handle_error(return_val error, const char *file_name, unsigned int line_num
     }
 }
 
+
+int is_fatal_error(return_val code) {
+    switch (code) {
+        case ERR_NULL_PTR:
+        case ERR_ALLOC_FAILED:
+        case ERR_REALLOC_FAILED:
+        case ERR_UNEXPECTED_VALUE:
+        case ERR_FAILED_TO_OPEN_FILE:
+        case ERR_FAILED_TO_CLOSE_FILE:
+        case ERR_FAILED_TO_WRITE_FILE:
+        case ERR_FAILED_TO_REMOVE_FILE:
+        case ERR_FAILED_TO_OPEN_AS_FOR_READ:
+        case ERR_FAILED_TO_CLOSE_AS:
+        case ERR_FAILED_TO_OPEN_AM_FOR_READ:
+        case ERR_FAILED_TO_OPEN_AM_FOR_WRITE:
+        case ERR_FAILED_TO_WRITE_AM:
+        case ERR_FAILED_TO_CLOSE_AM:
+        case ERR_FAILED_TO_REMOVE_AM:
+        case ERR_FAILED_TO_OPEN_OB_FOR_WRITE:
+        case ERR_FAILED_TO_WRITE_OB:
+        case ERR_FAILED_TO_CLOSE_OB:
+        case ERR_FAILED_TO_REMOVE_OB:
+        case ERR_FAILED_TO_OPEN_ENT_FOR_WRITE:
+        case ERR_FAILED_TO_WRITE_ENT:
+        case ERR_FAILED_TO_CLOSE_ENT:
+        case ERR_FAILED_TO_REMOVE_ENT:
+        case ERR_FAILED_TO_OPEN_EXT_FOR_WRITE:
+        case ERR_FAILED_TO_WRITE_EXT:
+        case ERR_FAILED_TO_CLOSE_EXT:
+        case ERR_FAILED_TO_REMOVE_EXT:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+int is_stage_code(return_val code) {
+    switch (code) {
+        case PRE_ASSEMBLER_START:
+        case FIRST_PASS_START:
+        case SECOND_PASS_START:
+        case PRE_ASSEMBLER_FAIL:
+        case FIRST_PASS_FAIL:
+        case SECOND_PASS_FAIL:
+        case PRE_ASSEMBLER_SUCCESS:
+        case FIRST_PASS_SUCCESS:
+        case SECOND_PASS_SUCCESS:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+void print_location(const char *file_name, unsigned int line_number) {
+    if (file_name && line_number > 0)
+        printf("In %s, line %u: ", file_name, line_number);
+    else if (file_name)
+        printf("In %s: ", file_name);
+
+    return;
+}
