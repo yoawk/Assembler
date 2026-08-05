@@ -74,6 +74,20 @@ return_val second_pass_loop(const char *assembly_file_name, macro_table *macro_t
     second_pass_update_entry_symbols(assembly_file_name, curr_file_name, macro_table_p, symbol_table_p, &found_error);
 
 
+    /* If no errors were found, produce the output files */
+    if (found_error != 1) {
+        /* Note that produced errors in this segment will be program errors */
+
+        /* Produce .ob file */
+        rv = produce_object_file(assembly_file_name, code_image, data_image, ICF, DCF, symbol_table_p);
+        if (rv != OK) {
+            handle_error(rv, NULL, 0);
+        }
+
+        /* Produce .ent file */
+
+        /* Produce .ext file */
+    }
 
     /* Free allocated memory */
     free(curr_file_name);
