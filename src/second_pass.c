@@ -15,6 +15,10 @@
 #include <string.h>
 
 
+/* .ent and .ext file field sizes */
+#define ENTRIES_FILE_FIELD_LOCATION_SIZE 4
+#define EXTERNS_FILE_FIELD_LOCATION_SIZE 4
+
 
 /**
  * Second pass helper function.
@@ -30,6 +34,20 @@
  */
 void second_pass_update_entry_symbols(const char *assembly_file_name, const char *am_file_name, const macro_table *macro_table_p,
                                       symbol_table *symbol_table_p, int *output_found_error);
+
+/**
+ * Produces the .ent file.
+ * Will not produce an empty .ent file.
+ * Behavior is undefined if input is invalid.
+ * @param assembly_file_name Input assembly file name.
+ * @param symbol_table_p Pointer to symbol table.
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_FAILED_TO_OPEN_ENT_FOR_WRITE if .ent file opening for write failed.
+ *          ERR_FAILED_TO_WRITE_ENT if writing operation to .ent file failed.
+ *          ERR_FAILED_TO_CLOSE_ENT if closing of .ent file failed.
+ *          ERR_FAILED_TO_REMOVE_ENT if removal of .ent file failed.
+ */
+return_val produce_ent_file(const char *assembly_file_name, symbol_table *symbol_table_p);
 
 
 /**
@@ -85,6 +103,9 @@ return_val second_pass_loop(const char *assembly_file_name, macro_table *macro_t
         }
 
         /* Produce .ent file */
+        rv = produce_ent_file(assembly_file_name, symbol_table_p);
+        if (rv != OK)
+            handle_error(rv, NULL, 0);
 
         /* Produce .ext file */
     }
@@ -213,6 +234,93 @@ void second_pass_update_entry_symbols(const char *assembly_file_name, const char
 
     return;
 }
+
+return_val produce_ent_file(const char *assembly_file_name, symbol_table *symbol_table_p) {
+    return_val rv;
+    unsigned int i;
+
+    symbol_entry *curr_symbol_entry; /* Current symbol entry in the symbol table loop */
+
+    int is_file_empty = 1; /* 1 if the produced file is empty, 0 otherwise */
+    FILE *ent_fp;          /* .ent file pointer */
+    char *write_buffer;    /* File write buffer */
+    size_t write_size, written_size;
+
+    if (!assembly_file_name || !symbol_table_p)
+        return ERR_NULL_PTR;
+
+    /* Open .ent file for writing */
+    rv = fopen_helper(assembly_file_name, ENT_FILE_EXTENSION, "w", &ent_fp);
+    /* Add additional context if opening failed */
+    if (rv == ERR_FAILED_TO_OPEN_FILE)
+        return ERR_FAILED_TO_OPEN_ENT_FOR_WRITE;
+    else if (rv != OK)
+        return rv;
+
+    /* Go over symbol table and search for symbol with entry attribute */
+    for (i = 0; i < symbol_table_p->symbol_count; i++) {
+        /* Symbol entries array should be set */
+        if (!(symbol_table_p->symbol_entries))
+            return ERR_NULL_PTR;
+
+        /* The current symbol entry dealt with */
+        curr_symbol_entry = (symbol_table_p->symbol_entries)[i];
+        /* Assumed symbol validity */
+        if (!curr_symbol_entry)
+            return ERR_NULL_PTR;
+
+        /* If symbol has entry attribute, add it to .ent file */
+        if ((curr_symbol_entry->attributes & SYMBOL_ENTRY_ATTR) != 0) {
+            /* If .ent file is empty, go down a line. Otherwise, update empty file flag */
+            if (is_file_empty == 1) {
+                is_file_empty = 0;
+            }
+            else {
+                if (fputc('\n', ent_fp) == EOF)
+                    return ERR_FAILED_TO_WRITE_ENT;
+            }
+
+            /* Add it to .ent file */
+
+            /* the line format of the .ent file is:
+             * (SYMBOL NAME)(SPACE)(4 DIGITS OF LOCATION IN DECIMAL WITH PADDING ZEROS)
+             * Where the location is ENTRIES_FILE_FIELD_LOCATION_SIZE decimal digits with zero padding.
+             */
+
+            /* Calculate the appropriate write size according to the format */
+            write_size = strlen(curr_symbol_entry->name) + 1 + ENTRIES_FILE_FIELD_LOCATION_SIZE;
+            /* Setup string buffer */
+            write_buffer = malloc_helper(write_size + 1); /* Added 1 byte for '\0' */
+            sprintf(write_buffer, "%s %0*hu", curr_symbol_entry->name, ENTRIES_FILE_FIELD_LOCATION_SIZE, curr_symbol_entry->location);
+
+            /* Perform write */
+            written_size = fwrite(write_buffer, sizeof(char), write_size, ent_fp);
+            free(write_buffer);
+            /* If write failed */
+            if (written_size < write_size)
+                return ERR_FAILED_TO_WRITE_ENT;
+
+            /* Current entry symbol was written successfully */
+        }
+    }
+
+    /* Close .ent file */
+    if (fclose(ent_fp) == EOF)
+        return ERR_FAILED_TO_CLOSE_ENT;
+
+    /* If no data was written, then delete the file */
+    if (is_file_empty == 1) {
+        rv = remove_helper(assembly_file_name, ENT_FILE_EXTENSION);
+        if (rv == ERR_FAILED_TO_REMOVE_FILE)
+            return ERR_FAILED_TO_REMOVE_ENT;
+        else if (rv != OK)
+            return rv;
+    }
+
+    /* .ent was produced successfully */
+    return OK;
+}
+
 
 
 return_val contains_label(const char *line, int *output_label_flag) {
