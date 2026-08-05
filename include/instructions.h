@@ -24,6 +24,13 @@
 #define RELATIVE_MODE (1 << 2)  /* Operand is a label pointing to an address (used for branching), e.g. %loop */
 #define REGISTER_MODE (1 << 3)  /* Operand is a register, e.g. r2 */
 
+/* ARE characters for the instruction header and the different operand addressing modes */
+#define INSTRUCTION_HEADER_ARE 'A'
+#define IMMEDIATE_MODE_ARE 'A'
+/* Direct mode addressing can be either Relocatable or External (check by symbol type) */
+#define RELATIVE_MODE_ARE 'A'
+#define REGISTER_MODE_ARE 'A'
+
 /* Operand addressing modes prefix characters */
 #define IMMEDIATE_PREFIX_CHAR '#'
 #define RELATIVE_PREFIX_CHAR '%'
