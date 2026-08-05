@@ -175,3 +175,18 @@ unsigned short bit_mask_to_value(unsigned char bit_mask) {
     }
 }
 
+return_val encode_directive_data(const directive_entry *data_directive, data_entry data_image[], unsigned short *DC_p) {
+    size_t i;
+
+    if (!data_directive || !data_image || !DC_p)
+        return ERR_NULL_PTR;
+
+    /* Go over .data directive's value list elements and encode each element */
+    for (i = 0; i < (data_directive->directive_data).data_integers.integer_count; i++) {
+        data_image[*DC_p].encoding = ((data_directive->directive_data).data_integers.integer_list[i] & WORD_MASK);
+        (*DC_p)++;
+    }
+
+    return OK;
+}
+

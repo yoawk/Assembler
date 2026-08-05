@@ -55,4 +55,15 @@ return_val encode_instruction(const instruction_entry *instruction, const operan
                               code_entry code_image[], unsigned short *IC_p, unsigned int am_file_line);
 
 
+
+/**
+ * Encodes a .data directive's value list elements into data image while updating DC accordingly.
+ * Assumes directive's content is valid - otherwise behavior is undefined.
+ * @param data_directive Valid data directive entry
+ * @param data_image Data image array
+ * @param DC_p Pointer to current DC
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ */
+return_val encode_directive_data(const directive_entry *data_directive, data_entry data_image[], unsigned short *DC_p);
+
 #endif
