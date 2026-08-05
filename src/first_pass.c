@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "handle_file.h"
 #include "instructions.h"
+#include "object_code.h"
 #include "directives.h"
 #include "utils.h"
 
