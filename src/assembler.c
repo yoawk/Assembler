@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
         /* Second pass stage */
         /* Symbol table and macro table are cleared by second pass */
         info_message(SECOND_PASS_START, curr_file_name);
+        rv = second_pass_loop(curr_file_name, &passed_macro_table, &passed_symbol_table, code_image, data_image, ICF, DCF);
         info_message(rv, curr_file_name);
 
         /* If second pass stage failed */
