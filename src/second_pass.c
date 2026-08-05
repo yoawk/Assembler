@@ -49,6 +49,22 @@ void second_pass_update_entry_symbols(const char *assembly_file_name, const char
  */
 return_val produce_ent_file(const char *assembly_file_name, symbol_table *symbol_table_p);
 
+/**
+ * Produces the .ext file.
+ * Will not produce an empty .ext file.
+ * Behavior is undefined if inputs is invalid.
+ * @param assembly_file_name Input assembly file name
+ * @param code_image Code image array
+ * @param ICF Final IC value
+ * @param symbol_table_p Pointer to symbol table.
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_FAILED_TO_OPEN_EXT_FOR_WRITE if .ext file opening for write failed.
+ *          ERR_FAILED_TO_WRITE_EXT if writing operation to .ext file failed.
+ *          ERR_FAILED_TO_CLOSE_EXT if closing of .ext file failed.
+ *          ERR_FAILED_TO_REMOVE_EXT if removal of .ext file failed.
+ */
+return_val produce_ext_file(const char *assembly_file_name, const code_entry code_image[], unsigned short ICF,
+                            const symbol_table *symbol_table_p);
 
 /**
  * Checks if a given line contains a label definition.
@@ -108,6 +124,9 @@ return_val second_pass_loop(const char *assembly_file_name, macro_table *macro_t
             handle_error(rv, NULL, 0);
 
         /* Produce .ext file */
+        rv = produce_ext_file(assembly_file_name, code_image, ICF, symbol_table_p);
+        if (rv != OK)
+            handle_error(rv, NULL, 0);
     }
 
     /* Free allocated memory */
@@ -322,6 +341,91 @@ return_val produce_ent_file(const char *assembly_file_name, symbol_table *symbol
 }
 
 
+return_val produce_ext_file(const char *assembly_file_name, const code_entry code_image[], unsigned short ICF,
+                            const symbol_table *symbol_table_p) {
+    return_val rv;
+    unsigned short i;
+    symbol_entry *curr_symbol_entry;
+
+    int is_file_empty = 1; /* 1 if the produced file is empty, 0 otherwise */
+    FILE *ext_fp;
+    char *write_buffer; /* Buffer for .ext file writing */
+    size_t write_size, written_size;
+
+    if (!assembly_file_name || !code_image || !symbol_table_p)
+        return ERR_NULL_PTR;
+
+    /* Open .ext file for writing */
+    rv = fopen_helper(assembly_file_name, EXT_FILE_EXTENSION, "w", &ext_fp);
+    if (rv == ERR_FAILED_TO_OPEN_FILE) {
+        return ERR_FAILED_TO_OPEN_EXT_FOR_WRITE;
+    }
+    else if (rv != OK)
+        return rv;
+
+    /* Search for code entries that depend on an external symbol and add them to .ext file */
+    for (i = INITIAL_IC; i < ICF; i++) {
+        /* The only operand addressing mode that can depend on an external symbol is direct */
+        if (code_image[i].operand_addr_mode == DIRECT_MODE) {
+            curr_symbol_entry = is_in_symbol_table(code_image[i].symbol_name, symbol_table_p);
+
+            /* Symbol should exist since input code image is assumed to be valid */
+            if (!curr_symbol_entry)
+                return ERR_NULL_PTR;
+
+            /* If operand's associated symbol is external, write to .ext file */
+            if ((curr_symbol_entry->attributes & SYMBOL_EXTERN_ATTR) != 0) {
+                /* Add it to .ext file */
+
+                /* If .ext file is empty, go down a line. Otherwise, update empty file flag */
+                if (is_file_empty == 1) {
+                    is_file_empty = 0;
+                }
+                else {
+                    if (fputc('\n', ext_fp) == EOF)
+                        return ERR_FAILED_TO_WRITE_EXT;
+                }
+
+                /* the line format of the .ext file is:
+                 * (SYMBOL NAME)(SPACE)(CODE ENTRY LOCATION)
+                 * Where the code entry's location is EXTERN_FILE_FIELD_LOCATION_SIZE decimal digits with zero padding.
+                 */
+
+                /* Calculate the appropriate write size according to the format */
+                write_size = strlen(curr_symbol_entry->name) + 1 + EXTERNS_FILE_FIELD_LOCATION_SIZE;
+                /* Setup string buffer */
+                write_buffer = malloc_helper(write_size + 1); /* Added 1 byte for '\0' */
+                sprintf(write_buffer, "%s %0*hu", curr_symbol_entry->name, EXTERNS_FILE_FIELD_LOCATION_SIZE, i);
+
+                /* Perform write */
+                written_size = fwrite(write_buffer, sizeof(char), write_size, ext_fp);
+                free(write_buffer);
+                /* If write failed */
+                if (written_size < write_size)
+                    return ERR_FAILED_TO_WRITE_EXT;
+
+                /* Written successfully */
+            }
+        }
+    }
+
+    /* Close file */
+    if (fclose(ext_fp) == EOF)
+        return ERR_FAILED_TO_CLOSE_EXT;
+
+
+    /* If no data was written, then delete the file */
+    if (is_file_empty == 1) {
+        rv = remove_helper(assembly_file_name, EXT_FILE_EXTENSION);
+        if (rv == ERR_FAILED_TO_REMOVE_FILE)
+            return ERR_FAILED_TO_REMOVE_EXT;
+        else if (rv != OK)
+            return rv;
+    }
+
+
+    return OK;
+}
 
 return_val contains_label(const char *line, int *output_label_flag) {
     return_val rv;
