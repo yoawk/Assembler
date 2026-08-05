@@ -212,6 +212,16 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
     }
 
 
+    /* Set final IC (ICF) and final DC (DCF) */
+    *ICF = IC;
+    *DCF = DC;
+
+    /* In the final memory code, the data image will come right after the code image,
+     * and therefore the location of data symbols in the symbol table should be incremented by ICF */
+    for (i = 0; i < symbol_table_p->symbol_count; i++) {
+        if ((symbol_table_p->symbol_entries)[i]->attributes & SYMBOL_DATA_ATTR)
+            ((symbol_table_p->symbol_entries)[i])->location += *ICF;
+    }
 
     /* Close .am file and free allocated memory */
     if (fclose(am_fp)) {
@@ -220,6 +230,18 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
     }
     free(curr_file_name);
 
+    if (found_error == 1) {
+        /* Free-up and clean macro and symbol tables */
+        rv = clear_macro_table(macro_table_p);
+        if (rv != OK)
+            handle_error(rv, NULL, 0);
+
+        rv = clear_symbol_table(symbol_table_p);
+        if (rv != OK)
+            handle_error(rv, NULL, 0);
+
+        return FIRST_PASS_FAIL;
+    }
 
     return FIRST_PASS_SUCCESS;
 }
