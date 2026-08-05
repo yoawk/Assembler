@@ -32,5 +32,27 @@ typedef struct {
 } data_entry;
 
 
+/**
+ * Encodes an instruction and its (possible) operands into the code image while adding additional
+ * necessary info to the relevant code entries.
+ * Fully encodes the instruction's header word into the code image.
+ * For any of the instruction's operands, if their addressing mode is symbol related,
+ * then encoding isn't filled yet (see update_encoding for second pass),
+ * but code entry's symbol name is set.
+ * Assumes inputs are valid, otherwise, behavior is undefined.
+ *
+ * @param instruction Instruction entry to encode
+ * @param operand_src Source operand to encode (may not be needed)
+ * @param operand_dst Destination operand to encode (may not be needed)
+ * @param code_image Code image array
+ * @param IC_p Pointer to IC (will be updated)
+ * @param am_file_line Instruction's line count in the .am file
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_INVALID_SRC_ADDR_MODE if source operand addressing mode is invalid.
+ *          ERR_INVALID_DEST_ADDR_MODE if destination operand addressing mode is invalid.
+ */
+return_val encode_instruction(const instruction_entry *instruction, const operand_entry *operand_src, const operand_entry *operand_dst,
+                              code_entry code_image[], unsigned short *IC_p, unsigned int am_file_line);
+
 
 #endif
