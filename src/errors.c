@@ -345,6 +345,45 @@ void handle_error(return_val error, const char *file_name, unsigned int line_num
     }
 }
 
+void info_message(return_val code, const char *file_name) {
+    if (!file_name || !is_stage_code(code))
+        return;
+
+    printf("%s ", INFO_TAG);
+
+    switch (code) {
+        case PRE_ASSEMBLER_START:
+            printf("Starting pre-assembler stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case FIRST_PASS_START:
+            printf("Starting first pass stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case SECOND_PASS_START:
+            printf("Starting second pass stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case PRE_ASSEMBLER_FAIL:
+            printf("Fail on pre-assembler stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case FIRST_PASS_FAIL:
+            printf("Fail on first pass stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case SECOND_PASS_FAIL:
+            printf("Fail on second pass stage for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case PRE_ASSEMBLER_SUCCESS:
+            printf("Pre-assembler stage finished successfully for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case FIRST_PASS_SUCCESS:
+            printf("First pass stage finished successfully for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        case SECOND_PASS_SUCCESS:
+            printf("Second pass stage finished successfully for file %s%s\n", file_name, AS_FILE_EXTENSION);
+            break;
+        default:
+            printf("Unknown return code (%d).\n", code);
+            break;
+    }
+}
 
 int is_fatal_error(return_val code) {
     switch (code) {
