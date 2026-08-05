@@ -55,6 +55,18 @@ return_val encode_instruction(const instruction_entry *instruction, const operan
                               code_entry code_image[], unsigned short *IC_p, unsigned int am_file_line);
 
 
+/**
+ * Update the encoding of a code entry that depends on a
+ * symbol value (operand with addressing mode of direct or relative).
+ * If code entry doesn't depend on a symbol value, nothing happens.
+ * @param code_image Code image array
+ * @param curr_IC IC of the to-be updated code entry
+ * @param symbol_table_p Pointer to symbol table
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_SYMBOL_DOES_NOT_EXIST if dependent symbol does not exist in symbol table.
+ *          ERR_RELATIVE_IS_EXTERNAL if code entry is of an operand with relative addressing mode but symbol is external.
+ */
+return_val update_encoding(code_entry code_image[], unsigned short curr_IC, const symbol_table *symbol_table_p);
 
 /**
  * Encodes a .data directive's value list elements into data image while updating DC accordingly.

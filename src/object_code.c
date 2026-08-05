@@ -205,3 +205,48 @@ return_val encode_directive_string(const directive_entry *string_directive, data
     return OK;
 }
 
+return_val update_encoding(code_entry code_image[], unsigned short curr_IC, const symbol_table *symbol_table_p) {
+    code_entry curr_entry;
+    symbol_entry *temp_symbol_entry;
+
+    if (!code_image || !symbol_table_p)
+        return ERR_NULL_PTR;
+
+    curr_entry = code_image[curr_IC];
+
+    /* Check if current code image entry is an operand that depends on a symbol value */
+    /* If current entry is an operand with direct addressing mode */
+    if (curr_entry.operand_addr_mode == DIRECT_MODE) {
+        /* Check if current entry's associated symbol is present is symbol table */
+        temp_symbol_entry = is_in_symbol_table(curr_entry.symbol_name, symbol_table_p);
+        /* If symbol doesn't exist */
+        if (!temp_symbol_entry)
+            return ERR_SYMBOL_DOES_NOT_EXIST;
+
+        /* Otherwise, set updated encoding to the matched symbol's value */
+        code_image[curr_IC].encoding = (temp_symbol_entry->location & WORD_MASK);
+        return OK;
+    }
+
+    /* If current entry is an operand with relative addressing mode */
+    else if (curr_entry.operand_addr_mode == RELATIVE_MODE) {
+        /* Check if current entry's associated symbol is present is symbol table */
+        temp_symbol_entry = is_in_symbol_table(curr_entry.symbol_name, symbol_table_p);
+        /* If symbol doesn't exist */
+        if (!temp_symbol_entry)
+            return ERR_SYMBOL_DOES_NOT_EXIST;
+
+            /* If symbol is external */
+        else if ((temp_symbol_entry->attributes & SYMBOL_EXTERN_ATTR) != 0)
+            return ERR_RELATIVE_IS_EXTERNAL;
+
+        /* Otherwise, set updated encoding to the offset of the operand and symbol */
+        code_image[curr_IC].encoding = ((temp_symbol_entry->location - curr_IC) & WORD_MASK);
+        return OK;
+    }
+
+    /* Otherwise, code entry doesn't need encoding update */
+    return OK;
+}
+
+
