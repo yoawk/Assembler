@@ -67,6 +67,21 @@ return_val encode_operand(const operand_entry *operand, code_entry code_image[],
  */
 int count_digits(unsigned short input_num);
 
+/**
+ * Writes given memory word info to object file using the format:
+ *          (WORD'S MEMORY ADDRESS)(SPACE)(WORD CONTENT)(SPACE)(WORD'S ARE CHARACTER)
+ * Where the memory address is OBJECT_FILE_FIELD_ADDRESS_SIZE digits in decimal with padding zeros,
+ * and the word's content is OBJECT_FILE_FIELD_CONTENT_SIZE digits of hex.
+ *
+ * @param memory_address Memory word's address in memory
+ * @param word_encoding Memory word's encoding
+ * @param ARE_char Memory word's ARE character
+ * @param ob_fp Pointer to open object file for writing
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_FAILED_TO_WRITE_OB if write operation to object file failed.
+ */
+return_val write_object_file_line(unsigned short memory_address, unsigned short word_encoding, char ARE_char, FILE *ob_fp);
+
 
 return_val encode_instruction(const instruction_entry *instruction, const operand_entry *operand_src, const operand_entry *operand_dst,
                               code_entry code_image[], unsigned short *IC_p, unsigned int am_file_line) {
@@ -263,11 +278,16 @@ return_val update_encoding(code_entry code_image[], unsigned short curr_IC, cons
 return_val produce_object_file(const char *assembly_file_name, const code_entry code_image[], const data_entry data_image[],
                                unsigned short ICF, unsigned short DCF, const symbol_table *symbol_table_p) {
     return_val rv;
+    unsigned short curr_address;
 
     FILE *ob_fp;    /* .ob file's file pointer */
     size_t write_size, written_size;
     char *write_buffer;
 
+    code_entry curr_code_entry;
+    data_entry curr_data_entry;
+    char ARE_char;  /* ARE character for file writing */
+    const symbol_entry *temp_symbol_entry;
 
     if (!assembly_file_name || !code_image || !data_image || !symbol_table_p)
         return ERR_NULL_PTR;
@@ -308,7 +328,66 @@ return_val produce_object_file(const char *assembly_file_name, const code_entry 
 
 
     /* Write code image to .ob file */
+    for (curr_address = INITIAL_IC; curr_address < ICF; curr_address++) {
+        curr_code_entry = code_image[curr_address];
+
+        /* Set ARE character */
+        switch (curr_code_entry.operand_addr_mode) {
+            case INSTRUCTION_HEADER_MODE:
+                ARE_char = INSTRUCTION_HEADER_ARE;
+                break;
+            case IMMEDIATE_MODE:
+                ARE_char = IMMEDIATE_MODE_ARE;
+                break;
+            case RELATIVE_MODE:
+                ARE_char = RELATIVE_MODE_ARE;
+                break;
+            case REGISTER_MODE:
+                ARE_char = REGISTER_MODE_ARE;
+                break;
+            case DIRECT_MODE:
+                /* An operand word with a direct addressing mode can be either
+                 * Relocatable or External - depending on the associated symbol */
+
+                /* Find its symbol */
+                temp_symbol_entry = is_in_symbol_table(curr_code_entry.symbol_name, symbol_table_p);
+                /* Code image entries are assumed to be valid */
+                if (!temp_symbol_entry)
+                    return ERR_NULL_PTR;
+
+                /* If associated symbol is external, set ARE value to External */
+                if ((temp_symbol_entry->attributes & SYMBOL_EXTERN_ATTR) != 0)
+                    ARE_char = 'E';
+                /* Otherwise, set it to Relocatable */
+                else
+                    ARE_char = 'R';
+
+                break;
+
+            default:
+                /* Code image is assumed to be valid */
+                return ERR_UNEXPECTED_VALUE;
+        }
+
+
+        /* Write word info into object file */
+        rv = write_object_file_line(curr_address, curr_code_entry.encoding, ARE_char, ob_fp);
+        if (rv != OK)
+            return rv;
+
+    }
+
     /* Write data image to .ob file */
+    /* Note that the data image comes right after the code image, so actual data addresses should be offset by ICF */
+    for (curr_address = INITIAL_DC; curr_address < DCF; curr_address++) {
+        curr_data_entry = data_image[curr_address];
+        ARE_char = 'A'; /* Data is absolute */
+
+        /* Write word info into object file */
+        rv = write_object_file_line(curr_address + ICF, curr_data_entry.encoding, ARE_char, ob_fp);
+        if (rv != OK)
+            return rv;
+    }
 
     /* Close .ob file */
     if (fclose(ob_fp) == EOF)
@@ -333,3 +412,29 @@ int count_digits(unsigned short input_num) {
     return result;
 }
 
+return_val write_object_file_line(unsigned short memory_address, unsigned short word_encoding, char ARE_char, FILE *ob_fp) {
+    size_t write_size, written_size;
+    char *write_buffer;
+
+    if (!ob_fp)
+        return ERR_NULL_PTR;
+
+
+    /* Calculate the appropriate write size according to the format (with added new line to separate lines) */
+    /*        newline         word address          space           word content         space ARE */
+    write_size = 1 + OBJECT_FILE_FIELD_ADDRESS_SIZE + 1 + OBJECT_FILE_FIELD_CONTENT_SIZE + 1 + 1;
+
+
+    /* Setup string buffer */
+    write_buffer = malloc_helper(write_size + 1); /* Added 1 byte for '\0' */
+    sprintf(write_buffer, "\n%0*hu %0*hX %c", OBJECT_FILE_FIELD_ADDRESS_SIZE, memory_address, OBJECT_FILE_FIELD_CONTENT_SIZE, word_encoding, ARE_char);
+
+    /* Perform write */
+    written_size = fwrite(write_buffer, sizeof(char), write_size, ob_fp);
+    free(write_buffer);
+    /* If write failed */
+    if (written_size < write_size)
+        return ERR_FAILED_TO_WRITE_OB;
+
+    return OK;
+}
