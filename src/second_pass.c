@@ -36,6 +36,15 @@ return_val second_pass_loop(const char *assembly_file_name, macro_table *macro_t
     strcpy(curr_file_name, assembly_file_name);
     strcat(curr_file_name, AM_FILE_EXTENSION);
 
+    /* Update partial encodings in code image */
+    for (i = INITIAL_IC; i < ICF; i++) {
+        rv = update_encoding(code_image, i, symbol_table_p);
+        if (rv != OK) {
+            handle_error(rv, curr_file_name, code_image[i].am_file_location);
+            found_error = 1;
+        }
+    }
+
 
     /* Free allocated memory */
     free(curr_file_name);
