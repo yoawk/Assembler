@@ -15,6 +15,30 @@
 #include <string.h>
 
 
+/**
+ * First pass helper function.
+ * Handles the encoding of an instruction and its (possible) operands in the code image.
+ * Also handles inserting the symbol of a label that precedes the instruction into the symbol table.
+ * Assumes inputs (that are needed for the operation) are valid.
+ *
+ * @param input_instruction_entry Instruction entry to encode
+ * @param input_operand_src Source operand entry to encode (may not be needed)
+ * @param input_operand_dst Destination operand entry to encode (may not be needed)
+ * @param label_flag 1 if a label is present in the instruction's line, 0 otherwise.
+ * @param label_symbol_name Symbol name of the label (if present)
+ * @param symbol_table_p Pointer to symbol table
+ * @param line_count Instruction's line count in the .am file.
+ * @param code_image Code image array
+ * @param IC_p Current IC (will be updated)
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ *          ERR_INVALID_SRC_ADDR_MODE if source operand addressing mode is invalid.
+ *          ERR_INVALID_DEST_ADDR_MODE if destination operand addressing mode is invalid.
+ */
+return_val first_pass_handle_instruction(const instruction_entry *input_instruction_entry, const operand_entry *input_operand_src,
+                                         const operand_entry *input_operand_dst, int label_flag,
+                                         const char *label_symbol_name, symbol_table *symbol_table_p, unsigned int line_count,
+                                         code_entry code_image[], unsigned short *IC_p);
+
 return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_table_p, symbol_table *symbol_table_p,
                            code_entry code_image[], data_entry data_image[], unsigned short *ICF, unsigned short *DCF) {
     return_val rv;
@@ -34,6 +58,9 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
     /* Symbol related temporary variables */
     char label_symbol_name[MAX_SYMBOL_NAME_SIZE + 1];
 
+    /* Instruction related temporary variables */
+    const instruction_entry *temp_instruction_entry;
+    operand_entry temp_operand_src, temp_operand_dst;
 
 
 
@@ -83,6 +110,10 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
 
         memset(&label_symbol_name, 0, sizeof(label_symbol_name));
 
+        temp_instruction_entry = NULL;
+        memset(&temp_operand_src, 0, sizeof(temp_operand_src));
+        memset(&temp_operand_dst, 0, sizeof(temp_operand_dst));
+
 
 
         /* Check if current line starts with a label/symbol definition */
@@ -102,6 +133,28 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
             label_flag = 1;
         }
 
+        /* Check if line contains an instruction */
+        rv = is_valid_instruction_line(line_buffer, label_flag, &temp_instruction_entry, &temp_operand_src, &temp_operand_dst);
+        if (rv != OK) {
+            handle_error(rv, curr_file_name, line_count);
+            found_error = 1;
+            continue;
+        }
+        /* If instruction entry isn't NULL, then line contains a valid instruction
+         * (note that symbol resolution happens in second pass) */
+        else if (temp_instruction_entry) {
+            rv = first_pass_handle_instruction(temp_instruction_entry, &temp_operand_src, &temp_operand_dst, label_flag, label_symbol_name,
+                                               symbol_table_p, line_count, code_image, &IC);
+            if (rv != OK) {
+                handle_error(rv, curr_file_name, line_count);
+                found_error = 1;
+                continue;
+            }
+
+            /* Encoding was successful. Go to next .am file line */
+            continue;
+        }
+
 
     /* Close .am file and free allocated memory */
     if (fclose(am_fp)) {
@@ -112,5 +165,38 @@ return_val first_pass_loop(const char *assembly_file_name, macro_table *macro_ta
 
 
     return FIRST_PASS_SUCCESS;
+}
+
+return_val first_pass_handle_instruction(const instruction_entry *input_instruction_entry, const operand_entry *input_operand_src,
+                                         const operand_entry *input_operand_dst, int label_flag,
+                                         const char *label_symbol_name, symbol_table *symbol_table_p, unsigned int line_count,
+                                         code_entry code_image[], unsigned short *IC_p) {
+    return_val rv;
+
+    /* Note that not all pointers are necessarily non-NULL */
+    if (!input_instruction_entry || !symbol_table_p || !code_image || !IC_p)
+        return ERR_NULL_PTR;
+
+    /* If line contains a label definition, add it to the symbol table */
+    if (label_flag == 1) {
+        /* Check if label's symbol name is not set */
+        if (!label_symbol_name)
+            return ERR_NULL_PTR;
+
+        /* Add new symbol entry to symbol table with code attribute and IC location */
+        rv = add_symbol_to_table(symbol_table_p, label_symbol_name, *IC_p, SYMBOL_CODE_ATTR);
+        if (rv != OK) {
+            return rv;
+        }
+    }
+
+    /* Encode the instruction's first word and possibly some of its operand words */
+    rv = encode_instruction(input_instruction_entry, input_operand_src, input_operand_dst, code_image, IC_p, line_count);
+    if (rv != OK) {
+        return rv;
+    }
+
+    /* Encoding was successful */
+    return OK;
 }
 
