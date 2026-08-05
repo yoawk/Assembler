@@ -66,4 +66,15 @@ return_val encode_instruction(const instruction_entry *instruction, const operan
  */
 return_val encode_directive_data(const directive_entry *data_directive, data_entry data_image[], unsigned short *DC_p);
 
+/**
+ * Encodes a .string directive's content string into data image while updating DC accordingly.
+ * Assumes directive's content is valid - otherwise behavior is undefined.
+ * @param string_directive Valid string directive entry
+ * @param data_image Data image array
+ * @param DC_p Pointer to current DC
+ * @return OK on success. ERR_NULL_PTR on unexpected NULL pointer.
+ */
+return_val encode_directive_string(const directive_entry *string_directive, data_entry data_image[], unsigned short *DC_p);
+
+
 #endif

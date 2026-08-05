@@ -190,3 +190,18 @@ return_val encode_directive_data(const directive_entry *data_directive, data_ent
     return OK;
 }
 
+return_val encode_directive_string(const directive_entry *string_directive, data_entry data_image[], unsigned short *DC_p) {
+    size_t i;
+
+    if (!string_directive || !data_image || !DC_p)
+        return ERR_NULL_PTR;
+
+    /* Go over .string directive's content string and encode each ASCII character including the terminating '\0' */
+    for (i = 0; i <= strlen((string_directive->directive_data).content_string); i++) {
+        data_image[*DC_p].encoding = (string_directive->directive_data).content_string[i];
+        (*DC_p)++;
+    }
+
+    return OK;
+}
+
