@@ -15,6 +15,9 @@
 #include <stdlib.h>
 
 
+/* Object file's field sizes */
+#define OBJECT_FILE_FIELD_ADDRESS_SIZE 4
+#define OBJECT_FILE_FIELD_CONTENT_SIZE 3
 
 /* Encoding sizes as masks. Often used for readability only */
 #define OPCODE_FIELD_SIZE 0xF
@@ -56,6 +59,13 @@ unsigned short bit_mask_to_value(unsigned char bit_mask);
  *          ERR_INVALID_ADDR_MODE if operand's addressing mode is invalid.
  */
 return_val encode_operand(const operand_entry *operand, code_entry code_image[], unsigned short *IC_p, unsigned int am_file_line);
+
+/**
+ * Returns the digit count of an unsigned short.
+ * @param input_num Input unsigned short
+ * @return The number's digit count
+ */
+int count_digits(unsigned short input_num);
 
 
 return_val encode_instruction(const instruction_entry *instruction, const operand_entry *operand_src, const operand_entry *operand_dst,
@@ -249,4 +259,77 @@ return_val update_encoding(code_entry code_image[], unsigned short curr_IC, cons
     return OK;
 }
 
+
+return_val produce_object_file(const char *assembly_file_name, const code_entry code_image[], const data_entry data_image[],
+                               unsigned short ICF, unsigned short DCF, const symbol_table *symbol_table_p) {
+    return_val rv;
+
+    FILE *ob_fp;    /* .ob file's file pointer */
+    size_t write_size, written_size;
+    char *write_buffer;
+
+
+    if (!assembly_file_name || !code_image || !data_image || !symbol_table_p)
+        return ERR_NULL_PTR;
+
+    /* Open the .ob file for writing */
+    rv = fopen_helper(assembly_file_name, OBJECT_FILE_EXTENSION, "w", &ob_fp);
+    /* Provide additional context */
+    if (rv == ERR_FAILED_TO_OPEN_FILE)
+        return ERR_FAILED_TO_OPEN_OB_FOR_WRITE;
+    else if (rv != OK)
+        return rv;
+
+    /* Write the object file's header line */
+    /* Its format is:
+     * (CODE IMAGE SIZE IN DECIMAL)(SPACE)(DATA IMAGE SIZE IN DECIMAL) */
+
+    /* Calculate the appropriate write size according to the format */
+    write_size = count_digits(ICF - INITIAL_IC) + 1 + count_digits(DCF - INITIAL_DC);    /* The sum of digits + space */
+    /* Setup string buffer */
+    write_buffer = malloc_helper(write_size + 1); /* Added 1 byte for '\0' */
+    sprintf(write_buffer, "%hu %hu", ICF - INITIAL_IC, DCF - INITIAL_DC);
+
+    /* Perform write */
+    written_size = fwrite(write_buffer, sizeof(char), write_size, ob_fp);
+    free(write_buffer);
+    /* If write failed */
+    if (written_size < write_size)
+        return ERR_FAILED_TO_WRITE_OB;
+
+    /* File header written successfully */
+
+
+
+    /* the format of the rest of the .ob file is:
+     * (WORD'S MEMORY ADDRESS)(SPACE)(WORD CONTENT)(SPACE)(WORD'S ARE CHARACTER)
+     * Where the memory address is OBJECT_FILE_FIELD_ADDRESS_SIZE digits in decimal with padding zeros,
+     * and the word's content is OBJECT_FILE_FIELD_CONTENT_SIZE digits of hex. */
+
+
+    /* Write code image to .ob file */
+    /* Write data image to .ob file */
+
+    /* Close .ob file */
+    if (fclose(ob_fp) == EOF)
+        return ERR_FAILED_TO_CLOSE_OB;
+
+    /* .ob file can't be empty because of its header, and therefore not 'empty' check is needed */
+
+    return OK;
+}
+
+int count_digits(unsigned short input_num) {
+    int result = 0;
+
+    if (input_num == 0)
+        return 1;
+
+    while (input_num != 0) {
+        input_num /= 10;
+        result++;
+    }
+
+    return result;
+}
 

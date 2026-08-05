@@ -88,5 +88,37 @@ return_val encode_directive_data(const directive_entry *data_directive, data_ent
  */
 return_val encode_directive_string(const directive_entry *string_directive, data_entry data_image[], unsigned short *DC_p);
 
+/**
+ * Writes the final object (.ob) file.
+ * The name of the file will be the same as the source assembly file name but
+ * with the OBJECT_FILE_EXTENSION.
+ *
+ * The file begins with a header line that includes the final code image size
+ * in decimal together with the final data image size decimal (separated by one space).
+ *
+ * Every memory word in the code/data image will be added in order (starting from address
+ * INITIAL_IC and up to, not including, DCF) to the object file with the format:
+ *          (WORD'S MEMORY ADDRESS)(SPACE)(WORD CONTENT)(SPACE)(WORD'S ARE CHARACTER)
+ * Where the memory address is OBJECT_FILE_FIELD_ADDRESS_SIZE digits in decimal with padding zeros,
+ * and the word's content is OBJECT_FILE_FIELD_CONTENT_SIZE digits of hex.
+ *
+ * Assumes pre-assembler and first pass stages completed successfully,
+ * as well the validity of the code/data images.
+ *
+ * @param assembly_file_name Input assembly file name (without extension).
+ * @param code_image Code image array
+ * @param data_image Data image array
+ * @param ICF Final IC
+ * @param DCF Final DC
+ * @param symbol_table_p Pointer to symbol table
+ * @return OK on success.
+ *      ERR_NULL_PTR on unexpected NULL input.
+ *      ERR_FAILED_TO_OPEN_OB_FOR_WRITE if object file opening for writing failed.
+ *      ERR_FAILED_TO_WRITE_OB if a write operation to object file failed.
+ *      ERR_FAILED_TO_CLOSE_OB if the object file couldn't close.
+ *      ERR_UNEXPECTED_VALUE If the operation failed due to an unexpected value.
+ */
+return_val produce_object_file(const char *assembly_file_name, const code_entry code_image[], const data_entry data_image[],
+                               unsigned short ICF, unsigned short DCF, const symbol_table *symbol_table_p);
 
 #endif
