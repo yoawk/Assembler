@@ -147,3 +147,95 @@ return_val get_nth_token(const char *line, int n, char **token) {
     *token = NULL;
     return OK;
 }
+
+
+
+return_val count_parameters(const char *line, unsigned int *output_count) {
+    unsigned int i;  /* Used for indexing*/
+    char c; /* Used for storing characters of string */
+
+    /*
+     * 0: Haven't reached name yet
+     * 1: Reading name
+     * 2: Reading space characters after name
+     * 3: After previous states
+     */
+    int name_flag;
+
+    /*
+     * -1: Before first parameter
+     * 0: Reading a parameter
+     * 1: Not reading a parameter and haven't found a comma
+     * 2: Not reading a parameter and found a comma
+     */
+    int comma_flag;
+
+    if (!line || !output_count)
+        return ERR_NULL_PTR;
+    *output_count = 0;
+
+
+    comma_flag = -1;
+    name_flag = 0;
+
+    /* Go over line and check comma validity
+     * Update comma and command name flags accordingly and detect errors.
+     */
+    for (i = 0; i < strlen(line); i++) {
+        c = line[i];
+
+        /* If c is a white character */
+        if (c == ' ' || c == '\t' || c == '\n') {
+            if (name_flag == 1)
+                name_flag = 2;
+            else if (comma_flag == 0)
+                comma_flag = 1;
+            continue;
+        }
+
+        /* If c is a comma */
+        else if (c == ',') {
+            if (name_flag != 3)
+                return ERR_EARLY_COMMA;
+            if (comma_flag == 2)
+                return ERR_MULTIPLE_COMMAS;
+
+            comma_flag = 2;
+            continue;
+        }
+
+
+        /* Otherwise, c is some other character */
+        else {
+            /* If this is first character of name */
+            if (name_flag == 0)
+                name_flag = 1;
+            /* If this is first character of first parameter */
+            else if (name_flag == 2) {
+                (*output_count)++;
+                name_flag = 3;
+                comma_flag = 0;
+            }
+            /* If this is first character of parameter but no comma separated it from another parameter */
+            else if (comma_flag == 1 && name_flag == 3)
+                return ERR_MISSING_COMMA;
+            /* If this is first character of a parameter and a comma separated it from previous parameter */
+            else if (comma_flag == 2 && name_flag == 3) {
+                (*output_count)++;
+                comma_flag = 0;
+            }
+
+            continue;
+        }
+    }
+
+    /* If no name found */
+    if (name_flag == 0)
+        return ERR_NO_NAME;
+
+    /* If a comma appeared after the last parameter */
+    if (comma_flag == 2)
+        return ERR_EXTRA_COMMA;
+
+    return OK;
+}

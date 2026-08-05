@@ -61,8 +61,25 @@ int is_empty_line(const char *line);
  * @param line Given line
  * @param n Token count (starting from 1)
  * @param token Pointer to output token string
- * @return OK on success, ERR_NULL_PTR on NULL pointer and ERR_ALLOC_FAILED on allocation fail.
+ * @return OK on success, ERR_NULL_PTR on unexpected NULL pointer.
  */
 return_val get_nth_token(const char *line, int n, char **token);
+
+/**
+ * Validates a line of a string (called name) followed by a sequence
+ * of parameters, and counts parameters.
+ * Valid format is as follows ("_" means one or more white characters: ' '/'\t'/'\n')
+ * name _param1_,_param2_,_param3 ... _,_paramN_
+ *
+ * @param line Input line
+ * @param output_count Pointer to output count of parameters
+ * @return OK on success (valid input). ERR_NULL_PTR on NULL pointer.
+ *          ERR_EARLY_COMMA on comma before reaching a parameter,
+ *          ERR_MULTIPLE_COMMAS for multiple commas together,
+ *          ERR_MISSING_COMMA for a missing comma,
+ *          ERR_NO_NAME if name string is missing,
+ *          ERR_EXTRA_COMMA for a comma after last parameter.
+ */
+return_val count_parameters(const char *line, unsigned int *output_count);
 
 #endif
