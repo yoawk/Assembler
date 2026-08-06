@@ -22,16 +22,16 @@ The target made-up machine has the following specifications:
 Every machine instruction is encoded as 1–3 consecutive memory words (cells).
 The first word always has the layout:
 
-|   Bits    |   8-11   |   4-7   |               2-3                |               0-1                |
-|:---------:|:--------:|:-------:|:--------------------------------:|:--------------------------------:|
-| **Field** | *opcode* | *funct* | *source operand addressing mode* | *target operand addressing mode* |
+|   Bits    |   8-11   |   4-7   |               2-3                |                  0-1                   |
+|:---------:|:--------:|:-------:|:--------------------------------:|:--------------------------------------:|
+| **Field** | *opcode* | *funct* | *source operand addressing mode* | *destionation operand addressing mode* |
 
 - If an instruction has no source operand, bits 2-3 are zeroed.
 - If an instruction has no target operand, bits 0-1 are zeroed.
 - `funct` is used to diffrentiate between different operations that share the same `opcode`.
-If an opcode is unique to a single operation, `funct` is zeroed.
-- If a source/target operand is used by the encoded instruction, an additional operand word will be appended
-(if both operands are used, the encoded source operand word will come before the target's).
+  If an opcode is unique to a single operation, `funct` is zeroed.
+- If a source/destination operand is used by the encoded instruction, an additional operand word will be appended
+  (if both operands are used, the encoded source operand word will come before the destination's).
 
 ### Assembly language
 
