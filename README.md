@@ -104,6 +104,43 @@ There are 4 addressing modes that can be used by the insruction:
 |    `rts`    |         -          |         -          |
 |   `stop`    |         -          |         -          |
 
+
+### Comment Lines and White Characters
+Lines starting with `;` are comment lines, and are ignored by the assembler.
+Redundent white characters (whitespaces and tabs) are ignored by the assembler (for example, `(tab)(space)clr(tab)(tab)r0(space)` will be treated as `clr r0`).
+
+### Macros
+
+- Defined with `mcro <name>` ... `mcroend`.
+- A macro body is a block of lines, that can be invoked later in the assembly code to "paste" the macro's block of lines.
+- Nested macro definitions are not allowed.
+- Macro names cannot collide with instruction/directive names, or be reused as labels.
+- Macro definitions always appear before their first use.
+
+Example:
+
+```asm
+mcro MC_GEN
+    inc r2
+    mov A, r1
+mcroend
+...
+MC_GEN
+clr r0
+MC_GEN
+```
+
+expands to:
+
+```asm
+...	
+inc r2
+mov A, r1
+clr r0
+inc r2
+mov A, r1
+```
+
 ### Assembler stages
 
 #### Pre-assembler stage
