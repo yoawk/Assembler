@@ -17,6 +17,9 @@ Written as part of a university project assignment.
 
 
 ### Project Structure
+<details>
+     <summary><i>view</i></summary>
+     
 ```
 .
 ├── Makefile
@@ -65,6 +68,7 @@ Written as part of a university project assignment.
     ├── symbols.c
     └── utils.c
 ```
+</details>
 
 ### Assignment Instructions
 A `.pdf` file containing the assignment's instruction (written in Hebrew) can be found [here](./assignment.pdf).
