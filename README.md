@@ -72,9 +72,40 @@ Both operand mode fields (bits 0-3) are unused/zeroed.
 | `rts`       | 14     | Returns from a subroutine. Pops the return address from the stack into `PC` |
 | `stop`      | 15     | Halts program execution immediately                                         |
 
+#### Addressing modes
+
+There are 4 addressing modes that can be used by the insruction:
+
+| mode number | name                | operand syntax                | encoded word contentns                                                                                                                  |
+|-------------|---------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| 0           | **Immediate**       | `#<number>` (e.g. `#-1`)      | The integer value itself represented in 2's complement, 12 bits wide                                                                    |
+| 1           | **Direct**          | `<label>` (e.g. `x`, `LIST`)  | The memory address the label represents, encoded as a 12-bit unsigned number                                                            |
+| 2           | **Relative**        | `%<label>` (e.g. `%LOOP`)     | Encodes the signeed 2's-complement distance (in words) from the address of the current data word to the target instruction's first word |
+| 3           | **Register direct** | `<register name>` (e.g. `r1`) | All bits of the the word zeroed out except the bit corresponding to the register's number (0-7)                                         |
+
+#### Legal addressing modes per instruction
+
+| Instruction | Legal source modes | Legal target modes |
+|:-----------:|:------------------:|:------------------:|
+|    `mov`    |      0, 1, 3       |        1, 3        |
+|    `cmp`    |      0, 1, 3       |      0, 1, 3       |
+|    `add`    |      0, 1, 3       |        1, 3        |
+|    `sub`    |      0, 1, 3       |        1, 3        |
+|    `lea`    |         1          |        1, 3        |
+|    `clr`    |         -          |        1, 3        |
+|    `not`    |         -          |        1, 3        |
+|    `inc`    |         -          |        1, 3        |
+|    `dec`    |         -          |        1, 3        |
+|    `jmp`    |         -          |        1, 2        |
+|    `bne`    |         -          |        1, 2        |
+|    `jsr`    |         -          |        1, 2        |
+|    `red`    |         -          |        1, 3        |
+|    `prn`    |         -          |      0, 1, 3       |
+|    `rts`    |         -          |         -          |
+|   `stop`    |         -          |         -          |
 
 ### Assembler stages
-     
+
 #### Pre-assembler stage
 
 #### First pass stage
@@ -85,7 +116,7 @@ Both operand mode fields (bits 0-3) are unused/zeroed.
 ### Project Structure
 <details>
      <summary><i>view</i></summary>
-     
+
 ```
 .
 ├── Makefile
