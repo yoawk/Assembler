@@ -33,7 +33,45 @@ The first word always has the layout:
 - If a source/destination operand is used by the encoded instruction, an additional operand word will be appended
   (if both operands are used, the encoded source operand word will come before the destination's).
 
-### Assembly language
+### Instruction Set
+
+The instruction set contains 16 operations that are grouped into three categories:
+
+#### Operations with 2 operands (source and destination)
+
+| Instruction    | Opcode | Funct | Effect                                                                                               |
+|----------------|--------|-------|------------------------------------------------------------------------------------------------------|
+| `mov src, dst` | 0      | –     | Copies the value of the source operand into the destination operand                                  |
+| `cmp src, dst` | 1      | –     | Compares the two operands, and updates the zero flag of PSW if they are equal (result is not stored) |
+| `add src, dst` | 2      | 10    | `dst = dst + src`                                                                                    |
+| `sub src, dst` | 2      | 11    | `dst = dst − src`                                                                                    |
+| `lea src, dst` | 4      | –     | Loads the effective address represented by label `src` into `dst`                                    |
+
+#### Operations with 1 operand (destination)
+
+For these, the source operand field (bits 2-3) is unused/zeroed.
+
+| Instruction | Opcode | Funct | Effect                                                                                  |
+|-------------|--------|-------|-----------------------------------------------------------------------------------------|
+| `clr dst`   | 5      | 10    | Sets operand to 0                                                                       |
+| `not dst`   | 5      | 11    | Bitwise inversion of the operand                                                        |
+| `inc dst`   | 5      | 12    | Increments the operand by 1                                                             |
+| `dec dst`   | 5      | 13    | Decrements the operand by 1                                                             |
+| `jmp label` | 9      | 10    | Unconditional jump: `PC = address(label)`                                               |
+| `bne label` | 9      | 11    | Branch to `label` if not equal to 0 (determined by the zero flag)                       |
+| `jsr label` | 9      | 12    | Subroutine call. Pushes `PC+2` (return address) to the stack, before jumping to `label` |
+| `red dst`   | 12     | –     | Reads one character from standard input and stores its ASCII code into the operand      |
+| `prn dst`   | 13     | –     | Prints the character stored in the operand                                              |
+
+#### Operations with no operands
+
+Both operand mode fields (bits 0-3) are unused/zeroed.
+
+| Instruction | Opcode | Effect                                                                      |
+|-------------|--------|-----------------------------------------------------------------------------|
+| `rts`       | 14     | Returns from a subroutine. Pops the return address from the stack into `PC` |
+| `stop`      | 15     | Halts program execution immediately                                         |
+
 
 ### Assembler stages
      
