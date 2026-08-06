@@ -8,7 +8,7 @@ Written as part of a university project assignment.
 ### Assembly language
 
 ### Assembler stages
-
+     
 #### Pre-assembler stage
 
 #### First pass stage
@@ -16,7 +16,55 @@ Written as part of a university project assignment.
 #### Second pass stage
 
 
-### Project structre
+### Project Structure
+```
+.
+├── Makefile
+├── README.md
+├── assignment.pdf          Assignement instructions contatining the assembly sepcifications (in Hebrew)
+├── build
+│   └── release
+│   └── debug
+├── examples                Examples of valid and invalid (containing errors) input files,
+│   ├── invalid_tests                                      with their corresponding output
+│   │   ├── invalid_input1.as
+│   │   └── ...
+│   └── valid_tests
+│       ├── valid_input1.am
+│       ├── valid_input1.as
+│       ├── valid_input1.ent
+│       ├── valid_input1.ob
+│       └── ...
+├── include                     .h files
+│   ├── assembler.h
+│   ├── directives.h
+│   ├── errors.h
+│   ├── first_pass.h
+│   ├── globals.h
+│   ├── handle_file.h
+│   ├── instructions.h
+│   ├── keywords.h
+│   ├── macros.h
+│   ├── object_code.h
+│   ├── pre_assembler.h
+│   ├── second_pass.h
+│   ├── symbols.h
+│   └── utils.h
+└── src                         .c files
+    ├── assembler.c             Contains main program loop
+    ├── directives.c            
+    ├── errors.c                
+    ├── first_pass.c
+    ├── handle_file.c
+    ├── instructions.c
+    ├── keywords.c
+    ├── macros.c
+    ├── object_code.c
+    ├── pre_assembler.c
+    ├── second_pass.c
+    ├── symbols.c
+    └── utils.c
+```
 
 ### Assignment Instructions
 A `.pdf` file containing the assignment's instruction (written in Hebrew) can be found [here](./assignment.pdf).
