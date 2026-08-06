@@ -1,9 +1,37 @@
 # Assembler in C
-An assembler written in ANSI C for a made-up assembly language.
+
+A two-pass assembler written in ANSI C for a made-up assembly language that targets a made-up machine.
 Written as part of a university project assignment.
 
 ## Project Overview
 
+### Target Machine
+
+The target made-up machine has the following specifications:
+
+- 8 general-purpose registers, named `r0`-`r7`. Each register is 12 bits wide.
+- An internal register named PSW (**P**rogram **S**tatus **W**ord) holding different status flags
+  (like the zero flag, updated by `cmp`).
+- An internal register named PC (**P**rogram **C**ounter) holding the address of the word currently
+  being executed (points to the first word of the current instruction).
+- Memory size of 4096 memory cells/words (addresses 0-4095). Each cell/word is 12 bits wide.
+- Integers are represented using 2's complement. No floating point support.
+
+### Machine Instruction Structure
+
+Every machine instruction is encoded as 1–3 consecutive memory words (cells).
+The first word always has the layout:
+
+|   Bits    |   8-11   |   4-7   |               2-3                |               0-1                |
+|:---------:|:--------:|:-------:|:--------------------------------:|:--------------------------------:|
+| **Field** | *opcode* | *funct* | *source operand addressing mode* | *target operand addressing mode* |
+
+- If an instruction has no source operand, bits 2-3 are zeroed.
+- If an instruction has no target operand, bits 0-1 are zeroed.
+- `funct` is used to diffrentiate between different operations that share the same `opcode`.
+If an opcode is unique to a single operation, `funct` is zeroed.
+- If a source/target operand is used by the encoded instruction, an additional operand word will be appended
+(if both operands are used, the encoded source operand word will come before the target's).
 
 ### Assembly language
 
