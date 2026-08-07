@@ -21,6 +21,7 @@ The target made-up machine has the following specifications:
 - The `.as` source files are made up of statements.
 - Only one statement is allowed per line, where lines separated by `\n`.
 - Maximum valid line length: **80 characters** (excluding the newline).
+- Redundent white characters (whitespaces and tabs) are ignored by the assembler (for example, `(tab)(space)clr(tab)(tab)r0(space)` will be treated as `clr r0`).
 
 The four kinds of statements (lines in the `.as` file) are:
 1. **Blank statement** - No characters at all, or only white characters (white spaces and tabs). These lines are ignored.
@@ -46,6 +47,9 @@ The first word always has the layout:
   (if both operands are used, the encoded source operand word will come before the destination's).
 
 ### Instruction Set
+An instruction is an operation (such as addition) that is encoded by the assembler into a CPU instruction,
+that can later be performed by the CPU on program execution (Theoretically).
+An instruction has the following strucutre: `[optional label:] [operation name] operand1, operand2`
 
 The instruction set contains 16 operations that are grouped into three categories:
 
@@ -116,10 +120,6 @@ There are 4 addressing modes that can be used by the insruction:
 |    `rts`    |         -          |         -          |
 |   `stop`    |         -          |         -          |
 
-
-### Comment Lines and White Characters
-Lines starting with `;` are comment lines, and are ignored by the assembler.
-Redundent white characters (whitespaces and tabs) are ignored by the assembler (for example, `(tab)(space)clr(tab)(tab)r0(space)` will be treated as `clr r0`).
 
 ### Macros
 
