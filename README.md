@@ -216,6 +216,29 @@ If the label is defined on an instruction line, then its value is the current in
 - A label may be *referenced* (used as an operand) before it is defined later in the file. It may also remain undefined in the current file
   as long as it is declared with `.extern`.
 
+### ARE Marks
+Each code image word has one of three relocation markers,
+(needed for the, non-implemented, linking/loading stages):
+- A (**A**bsolute) - The word's content does not depend on where the program is loaded in memory (e.g. an immediate value).
+- R (**R**elocatable) - The word's content depends on the load address (e.g. a word holding the address of a label defined in this file).
+- E (**E**xternal) - The word's content depends on the value of an external symbol resolved at link time.
+
+Data image words are always Absolute.
+
+### Output Files
+For an input `.as` file, if no errors occur, the assembler produces:
+- The `.am` file that contains the assembly code of the `.as` file after comment/white line removal and macro expansions.
+- The `.ob` file, containing the machine code (instruction image and data image).
+  The file's first line has the format `[length of code image] [length of data image]`,
+  and is used to diffrentiate between the two concatinated sections.
+  The rest of the lines are of the format `[4-digit decimal address] [3-digit hexadecimal word content] [ARE character]`.
+- The `.ent` file is generated if the source file contains at least one entry symbol (`.entry` line).
+  The file contains the entry symbols' names and addresses, in the following format:
+  `[symbol name] [4-digit decimal address]`.
+- The `.ext` file is generated if the source file contains at least one reference to an external symbol.
+  The file contains the referenced external symbols' name, and location of reference (in the code image)
+  in the following format: `[symbol name] [4-digit decimal address of reference]`.
+
 
 ### Assembler stages
 
