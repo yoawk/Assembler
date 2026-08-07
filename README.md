@@ -165,8 +165,8 @@ There are 4 directives:
 LIST: .data 6, -9, 100
 ```
 
-Declares one or more comma-separated signed decimal integers. Each value is stored as one word in the data image,
-advancing the data counter (DC) by one per value.
+Declares one or more comma-separated signed decimal integers in the valid range of the 2's complement of 12 bits.
+Each value is stored as one word in the data image, advancing the data counter (DC) by one per value.
 If a label is defined on this line, it receives the initial value of the DC (before advancing) as its
 address, with the `data` attribute.
 
