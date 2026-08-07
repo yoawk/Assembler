@@ -17,9 +17,21 @@ The target made-up machine has the following specifications:
 - Memory size of 4096 memory cells/words (addresses 0-4095). Each cell/word is 12 bits wide.
 - Integers are represented using 2's complement. No floating point support.
 
-### Machine Instruction Structure
+### `.as` Source Files Structure
+- The `.as` source files are made up of statements.
+- Only one statement is allowed per line, where lines separated by `\n`.
+- Maximum valid line length: **80 characters** (excluding the newline).
 
-Every machine instruction is encoded as 1–3 consecutive memory words (cells).
+The four kinds of statements (lines in the `.as` file) are:
+1. **Blank statement** - No characters at all, or only white characters (white spaces and tabs). These lines are ignored.
+2. **Comment statement** - A comment in the source file. The first non-white character of the comment line should be `;` and the entire line is ignored.
+3. **Directive statement** - A statement directing the assembler what to do when processing the current source file. Discussed later in the README.
+4. **Instruction statement** - Represents an operation for the CPU to execute when running the output program. Discussed later in the README.
+
+
+### Machine Code
+
+Each instruction is encoded as 1–3 consecutive memory words (cells).
 The first word always has the layout:
 
 |   Bits    |   8-11   |   4-7   |               2-3                |                  0-1                   |
