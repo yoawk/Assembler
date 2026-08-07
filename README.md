@@ -202,6 +202,20 @@ The symbol is entered into the symbol table with value/address `0` (since it's n
 and with the `external` attribute.
 A label **can't** be declared as both `entry` and `extern` in the same file.
 
+### Labels/Symbols
+Symbols are used to mark a certain code or data word. To define such symbols, we use labels.
+- A valid label starts with an alphabetic character, followed by any sequence of letters and/or digits.
+- Maximum length of 31 characters.
+- Definitions end with `:` (immediately after the label name, no space), at the start of an instruction line or a `.data`/`.string` line.
+- Labels are case-sensitive, meaning that `test` is different from `Test`.
+- A label may not be defined more than once.
+- Reserved words (instruction names, directive names, register names) and macro names cannot be used as label names.
+- The value that corresponds to a label/symbol depends on context. If the label is defined on a `.data`/`.string` line,
+then its value is the current data counter (DC).
+If the label is defined on an instruction line, then its value is the current instruction counter (IC).
+- A label may be *referenced* (used as an operand) before it is defined later in the file. It may also remain undefined in the current file
+  as long as it is declared with `.extern`.
+
 
 ### Assembler stages
 
