@@ -29,7 +29,6 @@ The four kinds of statements (lines in the `.as` file) are:
 3. **Directive statement** - A statement directing the assembler what to do when processing the current source file. Discussed later in the README.
 4. **Instruction statement** - Represents an operation for the CPU to execute when running the output program. Discussed later in the README.
 
-
 ### Machine Code
 
 Each instruction is encoded as 1–3 consecutive memory words (cells).
@@ -120,7 +119,6 @@ There are 4 addressing modes that can be used by the insruction:
 |    `rts`    |         -          |         -          |
 |   `stop`    |         -          |         -          |
 
-
 ### Macros
 
 - Defined with `mcro <name>` ... `mcroend`.
@@ -152,6 +150,58 @@ clr r0
 inc r2
 mov A, r1
 ```
+
+### Directives
+Directives are statements used to provide additional guidence to the assembler when it processes the source file.
+(e.g. Treat certain symbols differently, or allocate space for data).
+Directive keywords start with a `.` followed by their name in lowercase letters and have the following structure:  
+`[optional label:] .[directive name] param1, param2, ...`  
+
+There are 4 directives:
+
+#### `.data`
+
+```
+LIST: .data 6, -9, 100
+```
+
+Declares one or more comma-separated signed decimal integers. Each value is stored as one word in the data image,
+advancing the data counter (DC) by one per value.
+If a label is defined on this line, it receives the initial value of the DC (before advancing) as its
+address, with the `data` attribute.
+
+#### `.string`
+
+```
+STR: .string "abcd"
+```
+
+Declares a string literal. Each character is encoded as its ASCII value and stored as a word in the data image, in order.
+A `000000000000` word (used for string termination) is appended after the characters in the data image.
+DC advances by `(string length + 1)`. Label handling is identical to `.data`.
+
+#### `.entry`
+
+```
+.entry HELLO
+```
+
+Marks a label, **defined in the current `.as` file**, as visible to other source files (for the non-implemented linking stage).
+The label is recorded in the symbol table with the `entry` attribute and written to the `.ent` output file.
+A label written at the start of a `.entry` line itself is meaningless and is ignored.
+
+#### `.extern`
+
+```
+.extern val1
+```
+
+Declares a symbol/label that is **not** defined in the current `.as` file but can be used throughout the code.
+The symbol resolution is done by the (non-implemented) linking stage.
+The symbol is entered into the symbol table with value/address `0` (since it's not defined in the current `.as` file),
+and with the `external` attribute.
+A label **can't** be declared as both `entry` and `extern` in the same file.
+
 
 ### Assembler stages
 
