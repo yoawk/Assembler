@@ -21,7 +21,7 @@ The target made-up machine has the following specifications:
 - The `.as` source files are made up of statements.
 - Only one statement is allowed per line, where lines separated by `\n`.
 - Maximum valid line length: **80 characters** (excluding the newline).
-- Redundent white characters (whitespaces and tabs) are ignored by the assembler (for example, `(tab)(space)clr(tab)(tab)r0(space)` will be treated as `clr r0`).
+- Redundant white characters (white spaces and tabs) are ignored by the assembler (for example, `(tab)(space)clr(tab)(tab)r0(space)` will be treated as `clr r0`).
 
 The four kinds of statements (lines in the `.as` file) are:
 1. **Blank statement** - No characters at all, or only white characters (white spaces and tabs). These lines are ignored.
@@ -36,11 +36,11 @@ The first word always has the layout:
 
 |   Bits    |   8-11   |   4-7   |               2-3                |                  0-1                   |
 |:---------:|:--------:|:-------:|:--------------------------------:|:--------------------------------------:|
-| **Field** | *opcode* | *funct* | *source operand addressing mode* | *destionation operand addressing mode* |
+| **Field** | *opcode* | *funct* | *source operand addressing mode* | *destination operand addressing mode* |
 
 - If an instruction has no source operand, bits 2-3 are zeroed.
 - If an instruction has no target operand, bits 0-1 are zeroed.
-- `funct` is used to diffrentiate between different operations that share the same `opcode`.
+- `funct` is used to differentiate between different operations that share the same `opcode`.
   If an opcode is unique to a single operation, `funct` is zeroed.
 - If a source/destination operand is used by the encoded instruction, an additional operand word will be appended
   (if both operands are used, the encoded source operand word will come before the destination's).
@@ -48,7 +48,7 @@ The first word always has the layout:
 ### Instruction Set
 An instruction is an operation (such as addition) that is encoded by the assembler into a CPU instruction,
 that can later be performed by the CPU on program execution (Theoretically).
-An instruction has the following strucutre: `[optional label:] [operation name] operand1, operand2`
+An instruction has the following structure: `[optional label:] [operation name] operand1, operand2`
 
 The instruction set contains 16 operations that are grouped into three categories:
 
@@ -89,13 +89,13 @@ Both operand mode fields (bits 0-3) are unused/zeroed.
 
 #### Addressing modes
 
-There are 4 addressing modes that can be used by the insruction:
+There are 4 addressing modes that can be used by the instruction:
 
-| mode number | name                | operand syntax                | encoded word contentns                                                                                                                  |
+| mode number | name                | operand syntax                | encoded word contents                                                                                                                  |
 |-------------|---------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | 0           | **Immediate**       | `#<number>` (e.g. `#-1`)      | The integer value itself represented in 2's complement, 12 bits wide                                                                    |
 | 1           | **Direct**          | `<label>` (e.g. `x`, `LIST`)  | The memory address the label represents, encoded as a 12-bit unsigned number                                                            |
-| 2           | **Relative**        | `%<label>` (e.g. `%LOOP`)     | Encodes the signeed 2's-complement distance (in words) from the address of the current data word to the target instruction's first word |
+| 2           | **Relative**        | `%<label>` (e.g. `%LOOP`)     | Encodes the signed 2's-complement distance (in words) from the address of the current data word to the target instruction's first word |
 | 3           | **Register direct** | `<register name>` (e.g. `r1`) | All bits of the the word zeroed out except the bit corresponding to the register's number (0-7)                                         |
 
 #### Legal addressing modes per instruction
@@ -152,7 +152,7 @@ mov A, r1
 ```
 
 ### Directives
-Directives are statements used to provide additional guidence to the assembler when it processes the source file.
+Directives are statements used to provide additional guidance to the assembler when it processes the source file.
 (e.g. Treat certain symbols differently, or allocate space for data).
 Directive keywords start with a `.` followed by their name in lowercase letters and have the following structure:  
 `[optional label:] .[directive name] param1, param2, ...`  
@@ -230,7 +230,7 @@ For an input `.as` file, if no errors occur, the assembler produces:
 - The `.am` file that contains the assembly code of the `.as` file after comment/white line removal and macro expansions.
 - The `.ob` file, containing the machine code (instruction image and data image).
   The file's first line has the format `[length of code image] [length of data image]`,
-  and is used to diffrentiate between the two concatinated sections.
+  and is used to differentiate between the two concatenated sections.
   The rest of the lines are of the format `[4-digit decimal address] [3-digit hexadecimal word content] [ARE character]`.
 - The `.ent` file is generated if the source file contains at least one entry symbol (`.entry` line).
   The file contains the entry symbols' names and addresses, in the following format:
@@ -257,7 +257,7 @@ For an input `.as` file, if no errors occur, the assembler produces:
 .
 ├── Makefile
 ├── README.md
-├── assignment.pdf          Assignement instructions contatining the assembly sepcifications (in Hebrew)
+├── assignment.pdf          Assignment instructions containing the assembly specifications (in Hebrew)
 ├── build
 │   └── release
 │   └── debug
@@ -307,7 +307,7 @@ For an input `.as` file, if no errors occur, the assembler produces:
 A `.pdf` file containing the assignment's instruction (written in Hebrew) can be found [here](./assignment.pdf).
 
 
-## Bulding and Usage
+## Building and Usage
 
 
 ## Notes
