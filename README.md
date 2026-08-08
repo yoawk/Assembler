@@ -30,9 +30,23 @@ The four kinds of statements (lines in the `.as` file) are:
 4. **Instruction statement** - Represents an operation for the CPU to execute when running the output program. Discussed later in the README.
 
 ### Machine Code
+The machine code is made up of two segments - the code image, and the data image.  
+The code image contains encoded instructions, and the data image contains encoded data objects
+(such as strings).
+When constructing the code and data images, we use two counters, IC (**I**nstruction **C**ounter) 
+and DC (**D**ata **C**ounter),to keep track of the cell where the next 
+code/data word will be placed in the code/data image. Note that the initial IC is set to 100.  
+In the final machine code, the code image is placed first, and the data image comes right after the code image.  
 
-Each instruction is encoded as 1–3 consecutive memory words (cells).
-The first word always has the layout:
+Further explanations of the code and data image construction will be given later in the README
+
+### Instruction Set
+An instruction is an operation (such as addition) that is encoded by the assembler into a CPU instruction,
+that can later be performed by the CPU on program execution (Theoretically).
+An instruction has the following structure: `[optional label:] [operation name] operand1, operand2`
+
+In the code image, each instruction is encoded as 1–3 consecutive memory words (cells),
+and the first word always has the layout:
 
 |   Bits    |   8-11   |   4-7   |               2-3                |                  0-1                   |
 |:---------:|:--------:|:-------:|:--------------------------------:|:--------------------------------------:|
@@ -44,11 +58,6 @@ The first word always has the layout:
   If an opcode is unique to a single operation, `funct` is zeroed.
 - If a source/destination operand is used by the encoded instruction, an additional operand word will be appended
   (if both operands are used, the encoded source operand word will come before the destination's).
-
-### Instruction Set
-An instruction is an operation (such as addition) that is encoded by the assembler into a CPU instruction,
-that can later be performed by the CPU on program execution (Theoretically).
-An instruction has the following structure: `[optional label:] [operation name] operand1, operand2`
 
 The instruction set contains 16 operations that are grouped into three categories:
 
