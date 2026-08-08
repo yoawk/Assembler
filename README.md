@@ -349,6 +349,31 @@ A `.pdf` file containing the assignment's instruction (written in Hebrew) can be
 
 
 ## Building and Usage
+Note that building and execution of the project was only tested on an
+Ubuntu machine using `gcc` (specific flags in the Makefile)!
+
+Clone the repository
+```bash
+git clone https://github.com/yoawk/Assembler.git
+cd Assembler
+```
+
+Use the Makefile to compile the program (`make` needs to be installed).
+```bash
+make
+```
+
+The assmebler executable will be placed in `./build/release/` (if `make` or `make release` were used).
+
+In order to use the assembler, you must create (or use avaliable [examples](./examples)) a `.as` file (valid or invalid).  
+`.as` source files are passed to the assembler as program arguments **without** the `.as` extension.
+For example, the following command will make the assembler proccess the files `file1.as`, `file2.as`, `file3.as` in order.
+```
+./build/release/assembler file1 file2 file3
+```
+
+Each file is processed separatly, meaning that an **assembly** source file error (such as syntax error) of one file,
+will not affect the processing of the other files (and the generation of the output files).
 
 
 ## Notes
