@@ -248,15 +248,47 @@ For an input `.as` file, if no errors occur, the assembler produces:
   The file contains the referenced external symbols' name, and location of reference (in the code image)
   in the following format: `[symbol name] [4-digit decimal address of reference]`.
 
-
 ### Assembler stages
+<!-- This section might need more details explaining how the stages achieve their "goals". -->
+
+The assembler processes each input source file independently, producing its own set of output files.  
+The assembler's work is divided into three main stages:  
 
 #### Pre-assembler stage
+Operates on the given `.as` file and performs:
+- Macro expansion (together with the generation of the macro table containing the macros)
+- Comment/White lines filtering
+
+The stage
+- Assumes there are no nested macro definitions.
+- Assumes each macro definition start has a corresponding macro ending.
+- Assumes macro calls appear only after corresponding macro definitions.
+
+On success, writes the resulted assembly code into a new `.am` file with the same name as the `.as` file.
+When errors are found in the assembly code, reports them, and, if possible, coninues processing the `.as` file.
+The output `.am` file will not be created if any error is found, and the next stages will be skipped.
 
 #### First pass stage
+Operates on the generated `.am` file together with the generated macro table and performs:
+- Partial encoding of the `.am` file's instruction and directives into the code and data images
+(symbol dependent encodings happen in the second pass)
+- Parsing and validation of label definitions
+- Parsing and validation of `.extern` directive lines, marking external symbols in the symbol table
+- Generation of the symbol table
+- Determines the final sizes of the code and data images
+
+
+When errors are found in the assembly code, reports them, and, if possible, coninues processing the `.am` file.
+The second pass stage will not be executed if errors were found.
+
 
 #### Second pass stage
+Operates on the generated `.am` file together with the generated macro and symbol tables and performs:
+- Full encoding of the partially encoded code and data images
+- Parsing and validation of `.entry` directives, marking entry symbol in the symbol table
 
+When errors are found in the assembly code, reports them, and, if possible, coninues processing.
+If no errors were found, generates the `.ob`, `.ent` (if not empty),`.ext` (if not empty) output files.
 
 ### Project Structure
 <details>
