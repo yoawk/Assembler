@@ -1,0 +1,18 @@
+ThisSymbolIsA31CharactersLong1:	add r0,	r1
+s:	add r0,	r1
+.extern ThisSymbolIsA31CharactersLong2
+.extern ThisSymbolIsA31CharactersLong2
+.extern t
+.extern t
+.entry ThisSymbolIsA31CharactersLong1
+.entry ThisSymbolIsA31CharactersLong1
+.entry s
+.entry s
+mov #-2048, r0
+mov #+2047, r0
+BigData:	.data +2047
+SmallData:	.data -2048
+LongData:	.data 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+SmallString:	.string "a"
+BigSt: .string "This string is 63 characters long (excluding the ' ' and '\0' )"
+stop
