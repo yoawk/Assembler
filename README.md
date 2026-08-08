@@ -1,13 +1,13 @@
 # Assembler in C
 
-A two-pass assembler written in ANSI C for a made-up assembly language that targets a made-up machine.
+A two-pass assembler written in ANSI C for a made-up assembly language that targets an imaginary machine.
 Written as part of a university project assignment.
 
 ## Project Overview
 
 ### Target Machine
 
-The target made-up machine has the following specifications:
+The target imaginary machine has the following specifications:
 
 - 8 general-purpose registers, named `r0`-`r7`. Each register is 12 bits wide.
 - An internal register named PSW (**P**rogram **S**tatus **W**ord) holding different status flags
