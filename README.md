@@ -377,8 +377,8 @@ will not affect the processing of the other files (and the generation of the out
 
 
 ## Notes
-- The majority of git actions were performed *after* the project was finished, and 
-therefore the git actions may seem artificial.
+- The majority of git actions were performed *after* the project was finished, and
+  therefore some of the git actions may seem artificial.
 - The project contains an implementation of an *assembler* for the made-up assembly language.
 Other parts needed for the execution of the assembly code (such as the linker and loader) are **not** implemented in the current project.
 - Some instructions regarding the behavior of the assembler and the code design were given by the course's
